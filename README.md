@@ -4,6 +4,8 @@ Aiming to be the world's friendliest self-funding privacy wallet.
 
 ## Development roadmap
 
+First, set up hosting, keys, build and deploy all on Github for an extraordinarily simple maintenance CI/CD
+
 1. Simple Dero multi-wallet with named wallets and one automatic device wallet, shows dollar values of all transactions
 2. Polite ARM Dero miner (mining to device wallet by default) which only operates when plugged in and throttles by temperature
 3. Automatic overflow to cold storage
