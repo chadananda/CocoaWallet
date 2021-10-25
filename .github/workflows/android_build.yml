@@ -28,6 +28,7 @@ jobs:
 
     - name: Extra Step - look about for artifacts
       run: |
+        cd build
         ls -la
 
     - name: Upload APK Artifact GitHub Action
