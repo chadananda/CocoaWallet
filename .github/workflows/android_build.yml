@@ -22,8 +22,14 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+
     - name: Build with Gradle
       run: ./gradlew build
+
+    - name: Extra Step - look about for artifacts
+      run: |
+        ls -la
+
     - name: Upload APK Artifact GitHub Action
       uses: actions/upload-artifact@v2
       with:
