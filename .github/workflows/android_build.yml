@@ -30,6 +30,7 @@ jobs:
       run: |
         cd build
         cd intermediates
+        cd lint-cache
         ls -la
 
     - name: Upload APK Artifact GitHub Action
