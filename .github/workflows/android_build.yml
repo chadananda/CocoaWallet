@@ -29,8 +29,6 @@ jobs:
     - name: Extra Step - look about for artifacts
       run: |
         cd build
-        cd intermediates
-        cd lint-cache
         ls -la
 
     - name: Upload APK Artifact GitHub Action
