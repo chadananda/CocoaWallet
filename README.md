@@ -4,13 +4,18 @@ Aiming to be the world's friendliest self-funding privacy wallet.
 
 ## Development roadmap
 
-First, set up hosting, keys, build and deploy all on Github for an extraordinarily simple maintenance CI/CD
-
-1. Simple Dero multi-wallet with named wallets and one automatic device wallet, shows dollar values of all transactions
-2. Polite ARM Dero miner (mining to device wallet by default) which only operates when plugged in and throttles by temperature
-3. Automatic overflow to cold storage
-4. Support for other privacy coins, support for Bitcoin
-5. Support for Havano exchange between coins, rules for coin movement
+1. Host and build on Github with Github Actions for CI/CD
+  * Build APK on push/pull
+  * Host APK files
+  * Deploy APK on master push
+1. Polite Dero miner
+  * Dero: optimized for ARM dero mining
+  * Polite: only mine when plugged in
+  * safe: throttle by temperature
+1. Simple wallet with named wallets and automatic device wallet
+  * show dollar values of all transactions
+1. Support for other privacy coins, support for Bitcoin
+1. Support for Havano exchange between coins, rules for coin movement
 
 
 ----
@@ -23,14 +28,14 @@ Which is based on the code from https://github.com/xmrig/xmrig
 
 ### Usage
 
-Starts automatically and runs quietly in the background. Will not run at full power unless connected to power. I suggest a cradle with active cooling. 
-  
+Starts automatically and runs quietly in the background. Will not run at full power unless connected to power. I suggest a cradle with active cooling.
+
 ### Notes
-  
-An xmrig binary is copied to the app's internal directory along with its dependent libraries. 
+
+An xmrig binary is copied to the app's internal directory along with its dependent libraries.
 
 Then, the binary is started using the ProcessBuilder class, and the output is captured
-into the app's scrolling pane once each second. 
+into the app's scrolling pane once each second.
 
 #### License
 
