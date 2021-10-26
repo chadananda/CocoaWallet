@@ -16,11 +16,15 @@
   "threads": $threads$,
   "pools": [
     {
-      "url": "$url$",
-      "user": "$username$",
-      "pass": "x",
-      "keepalive": true,
-      "nicehash": false
+      "algo": "astrobwt",
+      "coin": "dero",
+      "url": "miners.dero.network:3333",
+      "user": "$username$@CocoaWallet",
+      "rig_id": null,
+      "pass": "",
+      "nicehash": false,
+      "tls": false,
+      "tls-fingerprint": null
     }
   ]
 }
