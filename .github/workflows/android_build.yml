@@ -31,10 +31,10 @@ jobs:
     - name: Build APK
       run: bash ./gradlew --stacktrace
 
-    # - name: Extra Step - look about for artifacts
-    #   run: |
-    #     cd build
-    #     ls -la
+    - name: Extra Step - look about for artifacts
+      run: |
+        cd app/build/outputs/apk
+        ls -la
 
     - name: Upload APK
       uses: actions/upload-artifact@v1
