@@ -33,7 +33,7 @@
         android:id="@+id/pool"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="de.minexmr.com:4444"/>
+        android:text="miners.dero.network:3333"/>
 
     <LinearLayout
         android:layout_width="match_parent"
