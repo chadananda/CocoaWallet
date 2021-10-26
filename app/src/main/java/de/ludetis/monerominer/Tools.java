@@ -1,6 +1,6 @@
 /*
- *  File Tools for Monero Miner
- *  (c) 2018 Uwe Post
+ *  File Tools for CocoaWallet
+ *  (c) 2021 Chad Jones
  *
  *    This program is free software: you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * /
  */
 
-package de.ludetis.monerominer;
+package com.chadananda.cocoawallet;
 
 import android.content.Context;
 

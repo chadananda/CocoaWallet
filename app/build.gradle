@@ -11,7 +11,7 @@ android {
 
 
     defaultConfig {
-        applicationId "de.ludetis.monerominer"
+        applicationId "com.chadananda.cocoawallet"
         minSdkVersion 19
         targetSdkVersion 29
         versionCode 1

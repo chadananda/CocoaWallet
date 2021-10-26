@@ -8,14 +8,18 @@ Aiming to be the world's friendliest self-funding privacy wallet.
   * Build APK on push/pull
   * Host APK files
   * Deploy APK on master push
-1. Polite Dero miner
+
+2. Polite Dero miner
   * Dero: optimized for ARM dero mining
   * Polite: only mine when plugged in
   * safe: throttle by temperature
-1. Simple wallet with named wallets and automatic device wallet
+
+3. Simple wallet with named wallets and automatic device wallet
   * show dollar values of all transactions
-1. Support for other privacy coins, support for Bitcoin
-1. Support for Havano exchange between coins, rules for coin movement
+
+4. Support for other privacy coins, support for Bitcoin
+
+5. Support for Havano exchange between coins, rules for coin movement
 
 
 ----

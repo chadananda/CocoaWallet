@@ -1,5 +1,5 @@
 /*
- *  Monero Miner App (c) 2018 Uwe Post
+ *  CocoaWallet App (c) 2021 Chad Jones
  *  based on the XMRig Monero Miner https://github.com/xmrig/xmrig
  *
  *    This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  * /
  */
 
-package de.ludetis.monerominer;
+package com.chadananda.cocoawallet;
 
 import android.app.Activity;
 import android.content.ComponentName;

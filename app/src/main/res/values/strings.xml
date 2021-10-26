@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MoneroMiner</string>
+    <string name="app_name">CocoaWallet</string>
     <string name="mining_pool_address">Mining Pool Address</string>
     <string name="username">Username</string>
     <string name="cmdline">Cmdline</string>
