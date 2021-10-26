@@ -5,12 +5,6 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!-- <uses-permission android:name="android.permission.BATTERY_STATS" /> -->
-    <!--
-        connected to power
-        battery charge
-        temperature
-     -->
 
     <application
         android:allowBackup="true"
@@ -26,7 +20,7 @@
         </activity>
 
         <service
-            android:name=".CocoaWallet"
+            android:name=".MiningService"
             android:enabled="true"/>
     </application>
 
