@@ -29,7 +29,7 @@ jobs:
     # - name: Build with Gradle
     #   run: ./gradlew clean build
     - name: Build APK
-      run: ./gradlew build --stacktrace
+      run: bash ./gradlew build --stacktrace
 
     - name: Extra Step - look about for artifacts
       run: |
