@@ -1,3 +1,5 @@
+[![Android CI](https://github.com/chadananda/CocoaWallet/actions/workflows/android_build.yml/badge.svg?branch=main)](https://github.com/chadananda/CocoaWallet/actions/workflows/android_build.yml)
+
 # CocoaWallet for Android/ARM64
 
 Aiming to be the world's friendliest self-funding privacy wallet.
