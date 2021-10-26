@@ -31,15 +31,15 @@ jobs:
     - name: Build APK
       run: bash ./gradlew assembleDebug --stacktrace
 
-    - name: Extra Step - look about for artifacts
-      run: |
-        # cd build
-        ls -la
+    # - name: Extra Step - look about for artifacts
+    #   run: |
+    #     cd build
+    #     ls -la
 
     - name: Upload APK
       uses: actions/upload-artifact@v1
       with:
-        name: apk
+        name: CocoaWallet.apk
         path: app/build/outputs/apk/debug/app-debug.apk
 
     # - name: Upload APK Artifact GitHub Action
