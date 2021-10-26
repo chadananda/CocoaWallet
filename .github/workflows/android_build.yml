@@ -33,7 +33,7 @@ jobs:
 
     - name: Extra Step - look about for artifacts
       run: |
-        cd build
+        # cd build
         ls -la
 
     - name: Upload APK
