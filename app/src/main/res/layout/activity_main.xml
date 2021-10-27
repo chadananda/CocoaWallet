@@ -37,7 +37,7 @@
         android:id="@+id/pool"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="miners.dero.network:3333"
+        android:text="gulf.moneroocean.stream:10032"
         tools:ignore="Autofill,HardcodedText,LabelFor,TextFields" />
 
     <LinearLayout
@@ -63,7 +63,7 @@
         android:id="@+id/username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRvNz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc"
+        android:text="8AaNnN8nQUMh3XQfyt4kEt8TR7RYnowhjVynzShWwVLiR6dWdSp42YeFvouLZoui7S46xSgDxapbeS7Tdqyz7em5Chqd4HA"
         tools:ignore="Autofill,HardcodedText,LabelFor,TextFields" />
 
     <LinearLayout
