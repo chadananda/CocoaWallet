@@ -30,6 +30,8 @@ jobs:
       run: bash ./gradlew build --stacktrace
 
     - name: Sign Android release custom
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: true
       # You may pin to the exact commit or the version.
       # uses: thomastvedt/sign-android-release@c2d33f93261f0f313de00a41c032c30d5fb843a6
       uses: thomastvedt/sign-android-release@v2.2
