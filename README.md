@@ -2,7 +2,7 @@
 
 # CocoaWallet for Android/ARM64
 
-Soon to be to be the world's friendliest self-funding privacy wallet.
+Soon to be to be the friendliest self-funding privacy wallet.
 
 ## Development roadmap
 
