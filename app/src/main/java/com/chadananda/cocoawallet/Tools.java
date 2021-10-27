@@ -20,9 +20,6 @@
 package com.chadananda.cocoawallet;
 
 import android.content.Context;
-import android.os.Build;
-import android.widget.Toast;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,8 +36,6 @@ import java.util.Map;
  */
 
 public class Tools {
-
-
     /**
      * load the config.json template file
      * @param context
@@ -73,6 +68,7 @@ public class Tools {
      * @param localFilePath
      */
     public static void copyFile(Context context, String assetFilePath, String localFilePath) {
+        BufferedReader reader = null;
         try {
             InputStream in = context.getAssets().open(assetFilePath);
             FileOutputStream out = new FileOutputStream(localFilePath);
@@ -98,6 +94,7 @@ public class Tools {
      * @param poolUrl
      * @param username
      * @param privatePath
+     *
      * @throws IOException
      */
     public static void writeConfig(String configTemplate, String poolUrl, String username, int threads, int maxCpu, String privatePath) {
@@ -141,17 +138,12 @@ public class Tools {
                         value = value.replaceAll ("\\s+", " ");
 
                     output.put (key, value);
-
                 }
-
             }
-
             br.close ();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
         return output;
-
     }
 }

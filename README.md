@@ -19,8 +19,6 @@ Soon to be to be the friendliest self-funding privacy wallet.
 * Integrate auto payout rules for local wallet and
 
 
-
-
 ----
 
 

@@ -19,13 +19,20 @@
 
 package com.chadananda.cocoawallet;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Application;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -40,7 +47,6 @@ import java.util.concurrent.TimeUnit;
 public class MainActivity extends Activity {
 
     private final static String[] SUPPORTED_ARCHITECTURES = {"arm64-v8a", "armeabi-v7a"};
-
     private ScheduledExecutorService svc;
     private TextView tvLog;
     private EditText edPool,edUser;
@@ -48,17 +54,20 @@ public class MainActivity extends Activity {
     private TextView tvSpeed,tvAccepted;
     private CheckBox cbUseWorkerId;
     private boolean validArchitecture = true;
-
     private MiningService.MiningServiceBinder binder;
+    public  static final int PERMISSIONS_MULTIPLE_REQUEST = 123;
 
+    String[] permissionArrays = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE };
+    int REQUEST_CODE = 101;
 
+    @TargetApi(Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         enableButtons(false);
-
         // wire views
         tvLog = findViewById(R.id.output);
         tvSpeed = findViewById(R.id.speed);
@@ -69,22 +78,26 @@ public class MainActivity extends Activity {
         edMaxCpu = findViewById(R.id.maxcpu);
         cbUseWorkerId = findViewById(R.id.use_worker_id);
 
-        // check architecture
-        if (!Arrays.asList(SUPPORTED_ARCHITECTURES).contains(Build.CPU_ABI.toLowerCase())) {
-            Toast.makeText(this, "Sorry, this app currently only supports 64 bit architectures, but yours is " + Build.CPU_ABI, Toast.LENGTH_LONG).show();
-            // this flag will keep the start button disabled
-            validArchitecture = false;
-        }
 
+        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED &&
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(permissionArrays, REQUEST_CODE);
+        }
+            if (!Arrays.asList(SUPPORTED_ARCHITECTURES).contains(Build.CPU_ABI.toLowerCase())) {
+                Toast.makeText(this, "Sorry, this app currently only supports 64 bit architectures, but yours is " + Build.CPU_ABI, Toast.LENGTH_LONG).show();
+                // this flag will keep the start button disabled
+                validArchitecture = false;
+        }
         // run the service
         Intent intent = new Intent(this, MiningService.class);
         bindService(intent, serverConnection, BIND_AUTO_CREATE);
         startService(intent);
-
-
     }
 
     private void startMining(View view) {
+        Log.e("start","start"+view);
         if (binder == null) return;
         MiningService.MiningConfig cfg = binder.getService().newConfig(edUser.getText().toString(), edPool.getText().toString(),
                 Integer.parseInt(edThreads.getText().toString()), Integer.parseInt(edMaxCpu.getText().toString()), cbUseWorkerId.isChecked());
@@ -110,22 +123,23 @@ public class MainActivity extends Activity {
     }
 
     private ServiceConnection serverConnection = new ServiceConnection() {
+        @SuppressLint("DefaultLocale")
         @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder ) {
             binder = (MiningService.MiningServiceBinder) iBinder;
             if (validArchitecture) {
                 enableButtons(true);
+                Log.e("binder","binder"+binder);
                 findViewById(R.id.start).setOnClickListener(MainActivity.this::startMining);
                 findViewById(R.id.stop).setOnClickListener(MainActivity.this::stopMining);
                 int cores = binder.getService().getAvailableCores();
-                // write suggested cores usage into editText
+                //write suggested cores usage into editText
                 int suggested = cores / 2;
                 if (suggested == 0) suggested = 1;
                 edThreads.getText().clear();
                 edThreads.getText().append(Integer.toString(suggested));
                 ((TextView) findViewById(R.id.cpus)).setText(String.format("(%d %s)", cores, getString(R.string.cpus)));
             }
-
         }
 
         @Override
@@ -150,9 +164,4 @@ public class MainActivity extends Activity {
             }
         });
     }
-
-
-
-
-
 }
