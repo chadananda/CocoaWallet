@@ -6,22 +6,19 @@ Soon to be to be the friendliest self-funding privacy wallet.
 
 ## Development roadmap
 
-1. Host and build on Github with Github Actions for CI/CD
-  * Build APK on push/pull
-  * Host APK files
-  * Deploy APK on master push
+* Get XMRIG to execute inside APK (currently has permissions error)
+* Update code, possibly replace with something NOT so JAVA
+  * turn off mining when not plugged, turn on automatically when plugged
+  * turn off when battery low, turn on when battery reaches >25%
+* Add GitHub action (if possible) to fetch and compile XMRIG using ARM64 container
+  * remove pool fee
+* Replace XMRIG with XMRIGCC for local server control
+* Dramatically improve and simplify interface
+* Integrate in basic wallet functionality for Dero and XMRIG
+* Integrate switching between Dero and XMR using MoneroOcean pool to mine Dero and pay in XMRIG
+* Integrate auto payout rules for local wallet and
 
-2. Polite Dero miner
-  * Dero: optimized for ARM dero mining
-  * Polite: only mine when plugged in
-  * safe: throttle by temperature
 
-3. Simple wallet with named wallets and automatic device wallet
-  * show dollar values of all transactions
-
-4. Support for other privacy coins, support for Bitcoin
-
-5. Support for Havano exchange between coins, rules for coin movement
 
 
 ----
