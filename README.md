@@ -14,6 +14,8 @@ Soon to be to be the friendliest self-funding privacy wallet.
 * Add GitHub action (if possible) to fetch and compile XMRIG using ARM64 container
   * Replace XMRIG with XMRIGCC or XMR-STAK-RX
   * remove pool fee
+  * compile with obfuscation to avoid virus warnings
+    * test with: https://www.virustotal.com/
 * Dramatically improve and simplify interface
 * Integrate in basic wallet functionality for Dero and XMRIG
 * Integrate switching between Dero and XMR using MoneroOcean pool to mine Dero and pay in XMRIG
