@@ -19,7 +19,7 @@
       "algo": "astrobwt",
       "coin": "dero",
       "url": "miners.dero.network:3333",
-      "user": "$username$@CocoaWallet",
+      "user": "$username$",
       "rig_id": null,
       "pass": "",
       "nicehash": false,
