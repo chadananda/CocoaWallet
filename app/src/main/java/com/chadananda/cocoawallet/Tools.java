@@ -20,6 +20,8 @@
 package com.chadananda.cocoawallet;
 
 import android.content.Context;
+import android.os.Build;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
