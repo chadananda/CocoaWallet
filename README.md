@@ -23,6 +23,8 @@ Soon to be to be the friendliest self-funding privacy wallet.
     * test with: https://www.virustotal.com/
 
 * Milestone 4: Wrap XMRIGCC controller app in simple APK
+  * compile on android: https://github.com/upost/MoneroMiner/issues/6
+  * XMRIGCC: https://github.com/untoreh/xmrigCC
   * show connection key in QR code, with scanner in wallet
   * works over local network for network
   * implment free VPN access if not found over local network
