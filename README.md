@@ -53,6 +53,11 @@ Soon to be to be the friendliest self-funding privacy wallet.
 ![Miner screen UI wireframe](miner-mockup.png)
 
 
+## Milestone #7 simple wallet functionality
+
+![Simple Wallet](simple-wallet-mockup.png)
+
+
 ----
 
 
