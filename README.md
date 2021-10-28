@@ -6,23 +6,29 @@ Soon to be to be the friendliest self-funding privacy wallet.
 
 ## Development roadmap
 
-* Get XMRIG to execute inside APK (currently has permissions error)
-* Refactor code, possibly replace with something NOT so JAVA
+* Milestone 1: Get XMRIG to execute inside APK (currently has permissions error)
+
+* Milestone 2: Refactor code, possibly replace with something NOT so JAVA
   * feature: turn off mining when not plugged, turn on automatically when plugged
   * feature: turn off when battery low, turn on when battery reaches >25%
   * simplify settings with default configs (pool, currency, addr etc)
-* Add GitHub action (if possible) to fetch and compile XMRIG using ARM64 container
-  * Replace XMRIG with XMRIGCC or XMR-STAK-RX
-  * remove pool fee
+
+* Milestone 3: Add GitHub action (if possible) to fetch and compile XMRIG using ARM64 container
+  * Replace XMRIG with XMRIGCC
+  * patch code to remove XMRIG base pool fee
   * compile with obfuscation to avoid virus warnings
     * test with: https://www.virustotal.com/
-* Dramatically improve and simplify interface
-* Integrate in basic wallet functionality for Dero and XMRIG
-* Integrate switching between Dero and XMR using MoneroOcean pool to mine Dero and pay in XMRIG
-* Integrate auto payout rules for local wallet and
+
+* Milestone 4: Wrap XMRIGCC controller in simple APK
+
+* Milestone 5: Dramatically improve and simplify UI for minder
+
+* Milestone 6: Integrate in basic DERO wallet functionality
+
+* Milestone 7: Integrate auto payout rules for local wallet and
 
 
-## Miner screen UI wireframe
+## Milestone #3 miner-screen UI wireframe
 
 ![Miner screen UI wireframe](miner-mockup.png)
 
