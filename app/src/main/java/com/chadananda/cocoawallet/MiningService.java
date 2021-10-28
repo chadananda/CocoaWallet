@@ -73,9 +73,9 @@ public class MiningService extends Service {
         String abi = Build.CPU_ABI.toLowerCase();
 
         // copy binaries to a path where we may execute it);
-//        Tools.copyFile(this, abi + "/xmrig", privatePath + "/xmrig");
-//        Tools.copyFile(this, abi + "/libuv", privatePath + "/libuv.so");
-//        Tools.copyFile(this, "libc++.so",  privatePath + "/libc++_shared.so");
+        Tools.copyFile(this, abi + "/xmrig", privatePath + "/xmrig");
+        Tools.copyFile(this, abi + "/libuv", privatePath + "/libuv.so");
+        //Tools.copyFile(this, "libc++.so",  privatePath + "/libc++_shared.so");
     }
 
     public class MiningServiceBinder extends Binder {
@@ -144,7 +144,6 @@ public class MiningService extends Service {
             process.destroy();
         }
 
-
         try {
             // write the config
             Tools.writeConfig(configTemplate, config.pool, config.username, config.threads, config.maxCpu, privatePath);
@@ -169,7 +168,7 @@ public class MiningService extends Service {
             Toast.makeText(this, "started", Toast.LENGTH_SHORT).show();
 
         } catch (Exception e) {
-            Log.e("error","error"+e);
+            Log.e("error","error"+e.getLocalizedMessage()+e.getCause());
             Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             process = null;
         }
@@ -199,8 +198,8 @@ public class MiningService extends Service {
      */
     private class OutputReaderThread extends Thread {
 
-        private InputStream inputStream;
-        private StringBuilder output = new StringBuilder();
+        private final InputStream inputStream;
+        private final StringBuilder output = new StringBuilder();
         private BufferedReader reader;
 
         OutputReaderThread(InputStream inputStream) {

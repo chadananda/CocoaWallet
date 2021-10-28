@@ -1,0 +1,1 @@
+C:/Users/My/AppData/Local/Android/Sdk/ndk/21.4.7075529/build//../build/core/add-application.mk:88: *** Android NDK: Aborting...    .  Stop.

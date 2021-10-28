@@ -34,18 +34,21 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
+import java.security.acl.Permission;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class MainActivity extends Activity {
-
+public class MainActivity extends Activity implements PermissionUtil.PermissionsCallBack{
     private final static String[] SUPPORTED_ARCHITECTURES = {"arm64-v8a", "armeabi-v7a"};
     private ScheduledExecutorService svc;
     private TextView tvLog;
@@ -56,18 +59,15 @@ public class MainActivity extends Activity {
     private boolean validArchitecture = true;
     private MiningService.MiningServiceBinder binder;
     public  static final int PERMISSIONS_MULTIPLE_REQUEST = 123;
-
+    public static final int RequestPermissionCode = 1;
     String[] permissionArrays = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE };
-    int REQUEST_CODE = 101;
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        enableButtons(false);
         // wire views
         tvLog = findViewById(R.id.output);
         tvSpeed = findViewById(R.id.speed);
@@ -77,14 +77,36 @@ public class MainActivity extends Activity {
         edThreads = findViewById(R.id.threads);
         edMaxCpu = findViewById(R.id.maxcpu);
         cbUseWorkerId = findViewById(R.id.use_worker_id);
+        enableButtons(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (PermissionUtil.checkAndRequestPermissions(this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.INTERNET
+                        )) {
+                    Log.i("aa", "Permissions are granted. Good to go!");
+                }
+            }
+
+//        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.INTERNET},1);
+//            return;
+//                }
+//
+//        if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.INTERNET},1);
+//            return;
+//        }
+//        if(checkSelfPermission(Manifest.permission.INTERNET)
+//                        != PackageManager.PERMISSION_GRANTED) {
+//            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.INTERNET},1);
+//            return;
+//        }
 
 
-        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED &&
-                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(permissionArrays, REQUEST_CODE);
-        }
             if (!Arrays.asList(SUPPORTED_ARCHITECTURES).contains(Build.CPU_ABI.toLowerCase())) {
                 Toast.makeText(this, "Sorry, this app currently only supports 64 bit architectures, but yours is " + Build.CPU_ABI, Toast.LENGTH_LONG).show();
                 // this flag will keep the start button disabled
@@ -96,13 +118,61 @@ public class MainActivity extends Activity {
         startService(intent);
     }
 
-    private void startMining(View view) {
-        Log.e("start","start"+view);
-        if (binder == null) return;
-        MiningService.MiningConfig cfg = binder.getService().newConfig(edUser.getText().toString(), edPool.getText().toString(),
-                Integer.parseInt(edThreads.getText().toString()), Integer.parseInt(edMaxCpu.getText().toString()), cbUseWorkerId.isChecked());
-        binder.getService().startMining(cfg);
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        PermissionUtil.onRequestPermissionsResult(this, requestCode, permissions, grantResults, this);
     }
+
+    private void startMining(View view) {
+        requestPermission();
+        if (edUser.getText().toString().isEmpty()){
+            Toast.makeText(this,"Enter UserName",Toast.LENGTH_SHORT).show();
+        }
+        else if (edPool.getText().toString().isEmpty())
+        {
+            Toast.makeText(this,"Enter Pool Address",Toast.LENGTH_SHORT).show();
+        }
+        else if (edThreads.getText().toString().isEmpty())
+        {
+            Toast.makeText(this,"Enter Threads",Toast.LENGTH_SHORT).show();
+        }
+        else if (edMaxCpu.getText().toString().isEmpty())
+        {
+            Toast.makeText(this,"Enter MaxCpu",Toast.LENGTH_SHORT).show();
+        }
+        else if (cbUseWorkerId.getText().toString().isEmpty())
+        {
+            Toast.makeText(this,"Enter Percent",Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Log.e("start","start"+view);
+            if (binder == null) return;
+            MiningService.MiningConfig cfg = binder.getService().newConfig(edUser.getText().toString(), edPool.getText().toString(),
+                    Integer.parseInt(edThreads.getText().toString()), Integer.parseInt(edMaxCpu.getText().toString()), cbUseWorkerId.isChecked());
+            binder.getService().startMining(cfg);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void requestPermission() {
+        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                if(checkSelfPermission(Manifest.permission.INTERNET)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    if (shouldShowRequestPermissionRationale(
+                            Manifest.permission.INTERNET)) {
+                    }
+                }
+            }
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.INTERNET},1);
+            return;
+        }
+    }
+
 
     private void stopMining(View view) {
         binder.getService().stopMining();
@@ -150,11 +220,14 @@ public class MainActivity extends Activity {
     };
 
     private void enableButtons(boolean enabled) {
+
         findViewById(R.id.start).setEnabled(enabled);
+
         findViewById(R.id.stop).setEnabled(enabled);
     }
 
 
+    @SuppressLint("SetTextI18n")
     private void updateLog() {
         runOnUiThread(()->{
             if (binder != null) {
@@ -163,5 +236,15 @@ public class MainActivity extends Activity {
                 tvSpeed.setText(binder.getService().getSpeed());
             }
         });
+    }
+
+    @Override
+    public void permissionsGranted() {
+        Toast.makeText(this, "Permissions granted!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void permissionsDenied() {
+        Toast.makeText(this, "Permissions Denied!", Toast.LENGTH_SHORT).show();
     }
 }

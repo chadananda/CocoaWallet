@@ -1,9 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
-
-
+    compileSdkVersion 28
+    packagingOptions {
+        pickFirst 'lib/x86/libc++_shared.so'
+        pickFirst 'lib/x86_64/libc++_shared.so'
+        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -13,21 +17,26 @@ android {
     defaultConfig {
         applicationId "com.chadananda.cocoawallet"
         minSdkVersion 19
-        targetSdkVersion 29
+        //noinspection ExpiredTargetSdkVersion
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
     }
     buildTypes {
         release {
-            minifyEnabled false
+                minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+
 
 }
 
 dependencies {
 
+implementation 'androidx.annotation:annotation:1.2.0'
+    implementation 'androidx.core:core:1.6.0'
 }

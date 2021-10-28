@@ -68,14 +68,15 @@ public class Tools {
      * @param localFilePath
      */
     public static void copyFile(Context context, String assetFilePath, String localFilePath) {
-        BufferedReader reader = null;
         try {
             InputStream in = context.getAssets().open(assetFilePath);
             FileOutputStream out = new FileOutputStream(localFilePath);
             int read;
+
             byte[] buffer = new byte[4096];
-            while ((read = in.read(buffer)) > 0) {
-                out.write(buffer, 0, read);
+            byte[] buf = new byte[4096];
+            while ((read = in.read(buf)) > 0) {
+                out.write(buf, 0, read);
             }
             out.close();
             in.close();
