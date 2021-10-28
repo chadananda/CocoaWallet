@@ -13,13 +13,17 @@ Soon to be to be the friendliest self-funding privacy wallet.
   * feature: turn off when battery low, turn on when battery reaches >25%
   * simplify settings with default configs (pool, currency, addr etc)
 
-* Milestone 3: Add GitHub action (if possible) to fetch and compile XMRIG using ARM64 container
+* Milestone 3: Create script to download and compile XMRIG using ARM64 container
   * Replace XMRIG with XMRIGCC
-  * patch code to remove XMRIG base pool fee
-  * compile with obfuscation to avoid virus warnings
+  * Patch code to remove XMRIG base pool fee
+  * Compile with obfuscation to avoid virus warnings
+    * Like: https://securityonline.info/avcleaner-c-c-source-obfuscator-for-antivirus-bypass/
     * test with: https://www.virustotal.com/
 
-* Milestone 4: Wrap XMRIGCC controller in simple APK
+* Milestone 4: Wrap XMRIGCC controller app in simple APK
+  * show connection key in QR code, with scanner in wallet
+  * works over local network for network
+  * implment free VPN access if not found over local network
 
 * Milestone 5: Dramatically improve and simplify UI for minder
 
