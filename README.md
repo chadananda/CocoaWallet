@@ -25,11 +25,19 @@ Soon to be to be the friendliest self-funding privacy wallet.
   * works over local network for network
   * implment free VPN access if not found over local network
 
-* Milestone 5: Dramatically improve and simplify UI for minder
+* Milestone 5: Dramatically improve and simplify UI for miner
+  * expanding settings sections
+  * live graph
+  * QR code scanner
+  * initially with only remote CocoaWallet
+  * share screen shot of graph with link
 
 * Milestone 6: Integrate in basic DERO wallet functionality
+  * seperate page for mangement
+  * include auto-payout level (pays all or excess)
+  * archive (hide) wallet which becomes visible again if money is deposited
 
-* Milestone 7: Integrate auto payout rules for local wallet and
+* Milestone 7: Integrate Monero wallet with exchange
 
 
 ## Milestone #3 miner-screen UI wireframe
