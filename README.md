@@ -9,39 +9,43 @@ Soon to be to be the friendliest self-funding privacy wallet.
 * Milestone 1: Get XMRIG to execute inside APK (currently has permissions error)
   * It runs on my phone in debug mode over USB but crashes as independent APK why?
 
-
 * Milestone 2: Refactor code, possibly replace with something NOT so JAVA
   * feature: turn off mining when not plugged, turn on automatically when plugged
   * feature: turn off when battery low, turn on when battery reaches >25%
-  * simplify settings with default configs (pool, currency, addr etc)
+  * simplify settings with default configs somewhere easy to edit
+    * contribute wallet, default pool url & port, default wallet
 
-* Milestone 3: Create script to download and compile XMRIG using ARM64 container
+* Milestone 3: Drastically improve UI with live graph of hash activity
+  * See wireframe below
+  * Also add link to view total wallet activity on moneroocean
+
+* Milestone 4: Create script to download and compile XMRIG using ARM64 container
   * Replace XMRIG with XMRIGCC
   * Patch code to remove XMRIG base pool fee
   * Compile with obfuscation to avoid virus warnings
     * Like: https://securityonline.info/avcleaner-c-c-source-obfuscator-for-antivirus-bypass/
     * test with: https://www.virustotal.com/
 
-* Milestone 4: Wrap XMRIGCC controller app in simple APK
+* Milestone 5: Wrap XMRIGCC controller app in simple APK
   * compile on android: https://github.com/upost/MoneroMiner/issues/6
   * XMRIGCC: https://github.com/untoreh/xmrigCC
   * show connection key in QR code, with scanner in wallet
   * works over local network for network
   * implment free VPN access if not found over local network
 
-* Milestone 5: Dramatically improve and simplify UI for miner
+* Milestone 6: Dramatically improve and simplify UI for miner
   * expanding settings sections
   * live graph
   * QR code scanner
   * initially with only remote CocoaWallet
   * share screen shot of graph with link
 
-* Milestone 6: Integrate in basic DERO wallet functionality
+* Milestone 7: Integrate in basic DERO wallet functionality
   * seperate page for mangement
   * include auto-payout level (pays all or excess)
   * archive (hide) wallet which becomes visible again if money is deposited
 
-* Milestone 7: Integrate Monero wallet with exchange
+* Milestone 8: Integrate Monero wallet with exchange
 
 
 ## Milestone #3 miner-screen UI wireframe
