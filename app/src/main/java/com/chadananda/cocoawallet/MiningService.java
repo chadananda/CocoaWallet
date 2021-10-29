@@ -22,6 +22,7 @@ package com.chadananda.cocoawallet;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Environment;
@@ -35,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -58,7 +60,6 @@ public class MiningService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
         // load config template
         configTemplate = Tools.loadConfigTemplate(this);
 
@@ -71,10 +72,12 @@ public class MiningService extends Service {
         Log.w(LOG_TAG, "my workerId: " + workerId);
 
         String abi = Build.CPU_ABI.toLowerCase();
+        Log.e("abi","abi"+abi);
+
 
         // copy binaries to a path where we may execute it);
-        Tools.copyFile(this, abi + "/xmrig", privatePath + "/xmrig");
-        Tools.copyFile(this, abi + "/libuv", privatePath + "/libuv.so");
+        Tools.copyFile(this,abi + "/xmrig", privatePath + "/xmrig");
+        Tools.copyFile(this,abi + "/libuv", privatePath + "/libuv.so");
         //Tools.copyFile(this, "libc++.so",  privatePath + "/libc++_shared.so");
     }
 
@@ -143,7 +146,6 @@ public class MiningService extends Service {
         if (process != null) {
             process.destroy();
         }
-
         try {
             // write the config
             Tools.writeConfig(configTemplate, config.pool, config.username, config.threads, config.maxCpu, privatePath);

@@ -2,18 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
-    packagingOptions {
-        pickFirst 'lib/x86/libc++_shared.so'
-        pickFirst 'lib/x86_64/libc++_shared.so'
-        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
-        pickFirst 'lib/arm64-v8a/libc++_shared.so'
-    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
-
     defaultConfig {
         applicationId "com.chadananda.cocoawallet"
         minSdkVersion 19
@@ -30,7 +22,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        pickFirst 'lib/x86/libc++_shared.so'
+        pickFirst 'lib/x86_64/libc++_shared.so'
+        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+    }
 
+    aaptOptions {
+        noCompress "arm64-v8a/xmrig"
+        noCompress "tflite"
+        noCompress "txt"
+        noCompress "pdf"
+    }
 
 
 }
