@@ -22,21 +22,17 @@ package com.chadananda.cocoawallet;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -66,19 +62,20 @@ public class MiningService extends Service {
         // path where we may execute our program
         privatePath = getFilesDir().getAbsolutePath();
 
-        Log.e("privatePath","privatePath"+privatePath);
+        Log.e("privatePath","(not error) privatePath: "+privatePath);
 
         workerId = fetchOrCreateWorkerId();
-        Log.w(LOG_TAG, "my workerId: " + workerId);
+        Log.e(LOG_TAG, "(not error) my workerId: " + workerId);
 
         String abi = Build.CPU_ABI.toLowerCase();
-        Log.e("abi","abi"+abi);
+        Log.e("abi","(not error) abi: "+abi);
 
 
         // copy binaries to a path where we may execute it);
         Tools.copyFile(this,abi + "/xmrig", privatePath + "/xmrig");
         Tools.copyFile(this,abi + "/libuv", privatePath + "/libuv.so");
         //Tools.copyFile(this, "libc++.so",  privatePath + "/libc++_shared.so");
+        
     }
 
     public class MiningServiceBinder extends Binder {

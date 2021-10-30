@@ -103,6 +103,7 @@ public class Tools {
                 .replace("$username$",username)
                 .replace("$threads$", Integer.toString(threads))
                 .replace("$maxcpu$", Integer.toString(maxCpu));
+
         PrintWriter writer = null;
         try {
             writer = new PrintWriter(new FileOutputStream(privatePath+"/config.json"));
