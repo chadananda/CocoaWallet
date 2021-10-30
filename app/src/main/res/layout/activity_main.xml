@@ -39,7 +39,7 @@
         android:id="@+id/pool"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="gulf.moneroocean.stream:10032"
+        android:text="gulf.moneroocean.stream:10001"
         tools:ignore="Autofill,HardcodedText,LabelFor,TextFields" />
 
     <LinearLayout
