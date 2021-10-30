@@ -19,21 +19,16 @@
 
 package com.chadananda.cocoawallet;
 
-import android.app.ApplicationErrorReport;
 import android.content.Context;
-
-import androidx.annotation.NonNull;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,11 +49,9 @@ public class Tools {
             InputStream json = context.getAssets().open("config.json");
             BufferedReader in = new BufferedReader(new InputStreamReader(json, "UTF-8"));
             String str;
-
             while ((str = in.readLine()) != null) {
                 buf.append(str);
             }
-
             in.close();
             return buf.toString();
         } catch (IOException e) {
@@ -120,29 +113,19 @@ public class Tools {
     }
 
     public static Map<String, String> getCPUInfo ()   {
-
         Map<String, String> output = new HashMap<>();
-
         try {
             BufferedReader br = null;
             br = new BufferedReader(new FileReader("/proc/cpuinfo"));
-
             String str;
-
             while ((str = br.readLine ()) != null) {
-
                 String[] data = str.split (":");
-
                 if (data.length > 1) {
-
                     String key = data[0].trim ().replace (" ", "_");
                     if (key.equals ("model_name")) key = "cpu_model";
-
                     String value = data[1].trim ();
-
                     if (key.equals ("cpu_model"))
                         value = value.replaceAll ("\\s+", " ");
-
                     output.put (key, value);
                 }
             }
