@@ -23,7 +23,9 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Application;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
@@ -32,6 +34,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -39,6 +42,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import java.security.acl.Permission;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -54,10 +58,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     private CheckBox cbUseWorkerId;
     private boolean validArchitecture = true;
     private MiningService.MiningServiceBinder binder;
-    public  static final int PERMISSIONS_MULTIPLE_REQUEST = 123;
-    public static final int RequestPermissionCode = 1;
-    String[] permissionArrays = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE };
+
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -195,7 +196,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
             binder = (MiningService.MiningServiceBinder) iBinder;
             if (validArchitecture) {
                 enableButtons(true);
-               Log.e("binder","(not error) binder: "+binder);
+                Log.e("binder","binder"+binder);
                 findViewById(R.id.start).setOnClickListener(MainActivity.this::startMining);
                 findViewById(R.id.stop).setOnClickListener(MainActivity.this::stopMining);
                 int cores = binder.getService().getAvailableCores();

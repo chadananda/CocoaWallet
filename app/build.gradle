@@ -15,12 +15,26 @@ android {
         versionName "1.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++14 -fexceptions -frtti"
+                arguments "-DANDROID_ARM_NEON=TRUE",'-DANDROID_STL=c++_shared'
+            }
+        }
     }
+
+
     buildTypes {
+        releaseDebugKey { initWith release }
         release {
                 minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        signingConfigs {
+            // use debug.keystore for releaseDebugKey builds
+            releaseDebugKey { initWith debug }
+        }
+
     }
     packagingOptions {
         pickFirst 'lib/x86/libc++_shared.so'
@@ -35,12 +49,9 @@ android {
         noCompress "txt"
         noCompress "pdf"
     }
-
-
 }
 
 dependencies {
-
 implementation 'androidx.annotation:annotation:1.2.0'
     implementation 'androidx.core:core:1.6.0'
 }
