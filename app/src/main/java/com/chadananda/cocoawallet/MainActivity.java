@@ -195,7 +195,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
             binder = (MiningService.MiningServiceBinder) iBinder;
             if (validArchitecture) {
                 enableButtons(true);
-                Log.e("binder","binder"+binder);
+               Log.e("binder","(not error) binder: "+binder);
                 findViewById(R.id.start).setOnClickListener(MainActivity.this::startMining);
                 findViewById(R.id.stop).setOnClickListener(MainActivity.this::stopMining);
                 int cores = binder.getService().getAvailableCores();

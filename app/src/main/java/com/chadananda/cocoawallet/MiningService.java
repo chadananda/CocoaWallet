@@ -75,7 +75,7 @@ public class MiningService extends Service {
         Tools.copyFile(this,abi + "/xmrig", privatePath + "/xmrig");
         Tools.copyFile(this,abi + "/libuv", privatePath + "/libuv.so");
         //Tools.copyFile(this, "libc++.so",  privatePath + "/libc++_shared.so");
-        
+
     }
 
     public class MiningServiceBinder extends Binder {
