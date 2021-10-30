@@ -7,8 +7,8 @@ Soon to be to be the friendliest self-funding privacy wallet.
 ## Development roadmap
 
 * Milestone 1: Get XMRIG to execute inside APK
-  * Is XMRIG running properly? I'm getting no data back. Maybe
-  * It might be required to compile XMRIG on an AMD phone to run properly.
+  * Is XMRIG running properly? I'm getting no data back.
+  * It might be necessary to compile XMRIG on ARM64 phone
   * What is the final config being used?
 
 * Milestone 2: Refactor code, possibly replace with something NOT so JAVA
