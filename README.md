@@ -7,9 +7,9 @@ Soon to be to be the friendliest self-funding privacy wallet.
 ## Development roadmap
 
 * Milestone 1: Get XMRIG to execute inside APK (currently has permissions error)
-  * It runs on my phone in debug mode over USB but crashes as independent APK why?
-  * It seems to have some version issues and some permissions issues
-  * Perhaps the XMRIG binary is not being run in the correct location?
+  * Is XMRIG running properly? I'm getting no data back. Maybe
+  * It might be required to compile XMRIG on an AMD phone to run properly.
+  * What is the final config being used?
 
 * Milestone 2: Refactor code, possibly replace with something NOT so JAVA
   * feature: turn off mining when not plugged, turn on automatically when plugged
