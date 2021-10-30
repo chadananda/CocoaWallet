@@ -6,7 +6,7 @@ Soon to be to be the friendliest self-funding privacy wallet.
 
 ## Development roadmap
 
-* Milestone 1: Get XMRIG to execute inside APK (currently has permissions error)
+* Milestone 1: Get XMRIG to execute inside APK
   * Is XMRIG running properly? I'm getting no data back. Maybe
   * It might be required to compile XMRIG on an AMD phone to run properly.
   * What is the final config being used?
