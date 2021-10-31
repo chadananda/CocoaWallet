@@ -22,21 +22,17 @@ package com.chadananda.cocoawallet;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -147,17 +143,18 @@ public class MiningService extends Service {
     public void startMining(MiningConfig config) {
         Log.i(LOG_TAG, "starting...");
         if (process != null) {
+            Log.i(LOG_TAG, "shutting down old process first...");
             process.destroy();
         }
         try {
             // write the config
             Tools.writeConfig(configTemplate, config.pool, config.username, config.threads, config.maxCpu, privatePath);
-
+//            Log.i(LOG_TAG, "private path: "+privatePath);
             // run xmrig using the config
             String[] args = {"./xmrig"};
             ProcessBuilder pb = new ProcessBuilder(args);
             // in our directory
-            pb.directory(getApplicationContext().getFilesDir());
+            // pb.directory(getApplicationContext().getFilesDir()); // isn't this the source directory???
             // with the directory as ld path so xmrig finds the libs
             pb.environment().put("LD_LIBRARY_PATH", privatePath);
             // in case of errors, read them

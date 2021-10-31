@@ -98,7 +98,7 @@ public class Tools {
      */
     public static void writeConfig(String configTemplate, String poolUrl, String username, int threads, int maxCpu, String privatePath) {
         String config = configTemplate.replace("$url$",poolUrl)
-                .replace("$username$",username)
+                .replace("$username$", username)
                 .replace("$threads$", Integer.toString(threads))
                 .replace("$maxcpu$", Integer.toString(maxCpu));
         PrintWriter writer = null;

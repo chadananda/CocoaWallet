@@ -139,10 +139,11 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
             Toast.makeText(this,"Enter Percent",Toast.LENGTH_SHORT).show();
         }
         else {
-            Log.e("start","start"+view);
+            Log.e("start","start: "+binder);
             if (binder == null) return;
             MiningService.MiningConfig cfg = binder.getService().newConfig(edUser.getText().toString(), edPool.getText().toString(),
                     Integer.parseInt(edThreads.getText().toString()), Integer.parseInt(edMaxCpu.getText().toString()), cbUseWorkerId.isChecked());
+            // Log.e("start","cfg: "+cfg.toString());
             binder.getService().startMining(cfg);
         }
     }
