@@ -23,9 +23,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Application;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
@@ -34,7 +32,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -42,7 +39,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import java.security.acl.Permission;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -58,7 +54,6 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     private CheckBox cbUseWorkerId;
     private boolean validArchitecture = true;
     private MiningService.MiningServiceBinder binder;
-
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -103,12 +98,12 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
 //            return;
 //        }
 
-
-            if (!Arrays.asList(SUPPORTED_ARCHITECTURES).contains(Build.CPU_ABI.toLowerCase())) {
-                Toast.makeText(this, "Sorry, this app currently only supports 64 bit architectures, but yours is " + Build.CPU_ABI, Toast.LENGTH_LONG).show();
-                // this flag will keep the start button disabled
-                validArchitecture = false;
+        if (!Arrays.asList(SUPPORTED_ARCHITECTURES).contains(Build.CPU_ABI.toLowerCase())) {
+            Toast.makeText(this, "Sorry, this app currently only supports 64 bit architectures, but yours is " + Build.CPU_ABI, Toast.LENGTH_LONG).show();
+            // this flag will keep the start button disabled
+            validArchitecture = false;
         }
+
         // run the service
         Intent intent = new Intent(this, MiningService.class);
         bindService(intent, serverConnection, BIND_AUTO_CREATE);

@@ -28,7 +28,6 @@ public class PermissionUtil {
 
         @RequiresApi(api = Build.VERSION_CODES.M)
         public static boolean checkAndRequestPermissions(Activity activity, String... permissions) {
-
             List<String> permissionsList = new ArrayList<>();
             for (String permission : permissions) {
                 int permissionState = activity.checkSelfPermission(permission);
@@ -42,7 +41,6 @@ public class PermissionUtil {
                         REQUEST_CODE_PERMISSIONS);
                 return false;
             }
-
             return true;
         }
 
