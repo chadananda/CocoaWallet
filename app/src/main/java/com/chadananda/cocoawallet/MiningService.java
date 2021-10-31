@@ -159,11 +159,14 @@ public class MiningService extends Service {
             // in case of errors, read them
             pb.redirectErrorStream();
             accepted = 0;
+
             // run it!
-            process = pb.start();
-            // start processing xmrig's output
+            Process process = pb.start();   // how do we check if this worked?
+
+            // start processing xmrig's output    // so why not use pb.redirectOutput(); ?
             outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
             outputHandler.start();
+
             Toast.makeText(this, "started", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Log.e("error","error"+e.getLocalizedMessage()+e.getCause());
@@ -172,6 +175,7 @@ public class MiningService extends Service {
         }
 
     }
+
 
     public String getSpeed() {
         return speed;
