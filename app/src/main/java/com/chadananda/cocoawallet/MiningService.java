@@ -154,7 +154,7 @@ public class MiningService extends Service {
             String[] args = {"./xmrig"};
             ProcessBuilder pb = new ProcessBuilder(args);
             // in our directory
-            // pb.directory(getApplicationContext().getFilesDir()); // isn't this the source directory???
+            pb.directory(getApplicationContext().getFilesDir()); // isn't this the source directory???
             // with the directory as ld path so xmrig finds the libs
             pb.environment().put("LD_LIBRARY_PATH", privatePath);
             // in case of errors, read them
