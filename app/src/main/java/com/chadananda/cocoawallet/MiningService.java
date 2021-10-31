@@ -104,7 +104,7 @@ public class MiningService extends Service {
      * @return unique workerId (created and saved in preferences once, then re-used)
      */
     private String fetchOrCreateWorkerId() {
-        SharedPreferences preferences = getSharedPreferences("MoneroMining", 0);
+        SharedPreferences preferences = getSharedPreferences("CocoaWallet", 0);
         String id = preferences.getString("id", null);
         if (id == null) {
             id = UUID.randomUUID().toString();
@@ -113,7 +113,6 @@ public class MiningService extends Service {
             ed.apply();
         }
         return id;
-
     }
 
     @Override
@@ -154,7 +153,7 @@ public class MiningService extends Service {
             String[] args = {"./xmrig"};
             ProcessBuilder pb = new ProcessBuilder(args);
             // in our directory
-            pb.directory(getApplicationContext().getFilesDir()); // isn't this the source directory???
+            pb.directory(getApplicationContext().getFilesDir());
             // with the directory as ld path so xmrig finds the libs
             pb.environment().put("LD_LIBRARY_PATH", privatePath);
             // in case of errors, read them
@@ -165,9 +164,7 @@ public class MiningService extends Service {
             // start processing xmrig's output
             outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
             outputHandler.start();
-
             Toast.makeText(this, "started", Toast.LENGTH_SHORT).show();
-
         } catch (Exception e) {
             Log.e("error","error"+e.getLocalizedMessage()+e.getCause());
             Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
@@ -209,10 +206,12 @@ public class MiningService extends Service {
         }
 
         public void run() {
+            Log.i("prog", "running");
             try {
                 reader = new BufferedReader(new InputStreamReader(inputStream));
                 String line;
                 while ((line = reader.readLine()) != null) {
+                    Log.i("prog", line); // never gets called
                     output.append(line + System.lineSeparator());
                     if (line.contains("accepted")) {
                         accepted++;
