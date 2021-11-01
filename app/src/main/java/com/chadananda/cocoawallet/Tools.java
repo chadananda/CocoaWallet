@@ -20,6 +20,7 @@
 package com.chadananda.cocoawallet;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -66,6 +67,7 @@ public class Tools {
      * @param localFilePath
      */
     public static void copyFile(Context context, String assetFilePath, String localFilePath) {
+//        boolean bool = false;
         try {
             //InputStream in = context.getAssets().open("arm64-v8a/xmrig");
 
@@ -80,7 +82,15 @@ public class Tools {
             out.close();
             in.close();
             File bin = new File(localFilePath);
+
+            // Checking if the binary file exists or not
+            if (!bin.exists()) Log.e("copy", "Copy failed for binary: '"+localFilePath+"'");
+              else Log.i("copy", "Copy succeeded for binary: '"+localFilePath+"'");
+
             bin.setExecutable(true);
+
+//            if (!bool) Log.e("copy", "Copy failed to set executable: '"+localFilePath+"'");
+//              else Log.i("copy", "Copy succeeded setting executable: '"+localFilePath+"'");
         }
         catch (IOException e) {
             throw new RuntimeException(e);
