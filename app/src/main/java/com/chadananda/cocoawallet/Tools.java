@@ -20,7 +20,6 @@
 package com.chadananda.cocoawallet;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,9 +30,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
-/**
+/*
  * Created by uwe on 19.01.18.
  */
 
@@ -67,8 +67,8 @@ public class Tools {
      * @param localFilePath
      */
     public static void copyFile(Context context, String assetFilePath, String localFilePath) {
-//        boolean bool = false;
         try {
+
             //InputStream in = context.getAssets().open("arm64-v8a/xmrig");
 
             InputStream in = context.getAssets().open(assetFilePath);
@@ -82,15 +82,7 @@ public class Tools {
             out.close();
             in.close();
             File bin = new File(localFilePath);
-
-            // Checking if the binary file exists or not
-            if (!bin.exists()) Log.e("copy", "Copy failed for binary: '"+localFilePath+"'");
-              else Log.i("copy", "Copy succeeded for binary: '"+localFilePath+"'");
-
             bin.setExecutable(true);
-
-//            if (!bool) Log.e("copy", "Copy failed to set executable: '"+localFilePath+"'");
-//              else Log.i("copy", "Copy succeeded setting executable: '"+localFilePath+"'");
         }
         catch (IOException e) {
             throw new RuntimeException(e);
@@ -131,6 +123,7 @@ public class Tools {
             while ((str = br.readLine ()) != null) {
                 String[] data = str.split (":");
                 if (data.length > 1) {
+                    //String key1=data[0].trim().replace(" ","-");
                     String key = data[0].trim ().replace (" ", "_");
                     if (key.equals ("model_name")) key = "cpu_model";
                     String value = data[1].trim ();

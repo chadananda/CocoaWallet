@@ -1,34 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_marginTop="8dp"
     android:layout_marginRight="8dp"
     android:layout_marginLeft="8dp"
-    tools:context="com.chadananda.cocoawallet.MainActivity">
+    tools:context="com.chadananda.cocoawallet.MainActivity"
+    >
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_gravity="center"
+        tools:ignore="UseCompoundDrawables"
+        android:layout_marginBottom="10dp">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@mipmap/ic_launcher"
+            android:layout_gravity="center"
+            tools:ignore="ContentDescription,RtlHardcoded" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="24sp"
             android:textColor="@android:color/black"
-            android:text="@string/app_name"/>
+            android:text="@string/app_name"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"/>
 
-        <ImageView
+        <Button
+            android:id="@+id/popup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@mipmap/ic_launcher"
-            android:layout_gravity="right"
-            tools:ignore="ContentDescription,RtlHardcoded" />
+            android:textSize="12sp"
+            android:textColor="@android:color/black"
+            android:text="popup"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"/>
 
-    </FrameLayout>
+        <Button
+            android:id="@+id/screenshot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="@android:color/black"
+            android:text="screenshot"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"/>
+
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
@@ -147,19 +176,33 @@
     </LinearLayout>
 
 
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:scrollbars="none">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="10dp"
+            android:layout_margin="10dp">
 
         <TextView
             android:id="@+id/output"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/darker_gray"
-            android:text="..."
-            tools:ignore="HardcodedText" />
+            android:background="@android:color/holo_blue_light"
+            android:text="......."
+            android:textColor="@android:color/black"
+            android:textStyle="italic"
+            android:textSize="12sp"
+            android:padding="10dp"
+            tools:ignore="HardcodedText"/>
+
+        </androidx.cardview.widget.CardView>
 
     </ScrollView>
 
@@ -168,34 +211,33 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="10dp">
+        android:layout_marginBottom="10dp"
+        android:layout_gravity="center"
+        android:gravity="center">
 
         <Button
             android:id="@+id/start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/start"
-            tools:ignore="ButtonStyle,RtlHardcoded"
+            android:layout_alignParentStart="true"
             android:layout_marginLeft="10dp"
             android:background="@android:color/background_light"
-            android:layout_marginBottom="10dp"
-            android:layout_alignParentStart="true"
-            android:textColor="@android:color/black"/>
+            android:text="@string/start"
+            android:textColor="@android:color/black"
+            tools:ignore="ButtonStyle,RtlHardcoded" />
 
         <Button
             android:id="@+id/stop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/stop"
-            android:textColor="@android:color/black"
-            tools:ignore="ButtonStyle,RelativeOverlap,RtlHardcoded"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
             android:layout_marginRight="10dp"
             android:background="@android:color/background_light"
-            android:layout_marginBottom="10dp"
-            android:layout_gravity="right"
-            android:layout_alignParentRight="true"
-            android:gravity="center"/>
-
+            android:gravity="center"
+            android:text="@string/stop"
+            android:textColor="@android:color/black"
+            tools:ignore="ButtonStyle,RelativeOverlap,RtlHardcoded" />
     </RelativeLayout>
 
 </LinearLayout>

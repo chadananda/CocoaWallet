@@ -24,21 +24,36 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -47,13 +62,16 @@ import java.util.concurrent.TimeUnit;
 public class MainActivity extends Activity implements PermissionUtil.PermissionsCallBack{
     private final static String[] SUPPORTED_ARCHITECTURES = {"arm64-v8a", "armeabi-v7a"};
     private ScheduledExecutorService svc;
+    private ImageView imageview;
     private TextView tvLog;
     private EditText edPool,edUser;
     private EditText  edThreads, edMaxCpu;
     private TextView tvSpeed,tvAccepted;
     private CheckBox cbUseWorkerId;
+    private Button screenshot;
     private boolean validArchitecture = true;
     private MiningService.MiningServiceBinder binder;
+    public static final int PERMISSION_WRITE = 0;
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -68,8 +86,59 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         edUser = findViewById(R.id.username);
         edThreads = findViewById(R.id.threads);
         edMaxCpu = findViewById(R.id.maxcpu);
+        imageview = findViewById(R.id.imageView);
         cbUseWorkerId = findViewById(R.id.use_worker_id);
+        screenshot=findViewById(R.id.screenshot);
         enableButtons(true);
+
+
+        Button popup = findViewById(R.id.popup);
+        popup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+                View popupView = inflater.inflate(R.layout.popup, null);
+
+                // create the popup window
+                int width = LinearLayout.LayoutParams.MATCH_PARENT;
+                int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+                boolean focusable = true; // lets taps outside the popup also dismiss it
+                final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+                popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
+
+                // dismiss the popup window when touched
+                popupView.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        popupWindow.dismiss();
+                        return true;
+                    }
+                });
+            }
+        });
+
+//        Button shareButton = (Button) findViewById(R.id.share_button);
+//        shareButton.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//
+//                Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+//                Uri screenshotUri = Uri.parse(Images.Media.EXTERNAL_CONTENT_URI + "/" + imageIDs);
+//
+//                sharingIntent.setType("image/jpeg");
+//                sharingIntent.putExtra(Intent.EXTRA_STREAM, screenshotUri);
+//                startActivity(Intent.createChooser(sharingIntent, "Share image using"));
+//
+//            }
+//        });
+
+        screenshot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TakeScreenShot();
+            }
+        });
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (PermissionUtil.checkAndRequestPermissions(this,
@@ -111,10 +180,14 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     }
 
 
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         PermissionUtil.onRequestPermissionsResult(this, requestCode, permissions, grantResults, this);
+        if (requestCode==PERMISSION_WRITE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            //do somethings
+        }
     }
 
     private void startMining(View view) {
@@ -145,6 +218,33 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                     Integer.parseInt(edThreads.getText().toString()), Integer.parseInt(edMaxCpu.getText().toString()), cbUseWorkerId.isChecked());
             // Log.e("start","cfg: "+cfg.toString());
             binder.getService().startMining(cfg);
+
+        }
+    }
+
+
+    public void TakeScreenShot() {
+        try {
+            File mydir = new File(Environment.getExternalStorageDirectory() + "/11zon");
+            if (!mydir.exists()) {
+                mydir.mkdirs();
+            }
+
+            View view = getWindow().getDecorView().getRootView();
+            view.setDrawingCacheEnabled(true);
+            Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache());
+            view.setDrawingCacheEnabled(false);
+
+            Uri fileUri = Uri.parse(mydir.getAbsolutePath() + File.separator + "IMG_" + System.currentTimeMillis() + ".jpg");
+            FileOutputStream outputStream = new FileOutputStream(String.valueOf(fileUri));
+
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            outputStream.flush();
+            outputStream.close();
+            Log.e("uri","uri"+fileUri);
+            imageview.setImageURI(fileUri);
+        } catch(IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -213,9 +313,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     };
 
     private void enableButtons(boolean enabled) {
-
         findViewById(R.id.start).setEnabled(enabled);
-
         findViewById(R.id.stop).setEnabled(enabled);
     }
 
@@ -227,6 +325,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 tvLog.setText(binder.getService().getOutput());
                 tvAccepted.setText(Integer.toString(binder.getService().getAccepted()));
                 tvSpeed.setText(binder.getService().getSpeed());
+                Log.e("aa","aa"+binder.getService().getOutput());
             }
         });
     }
@@ -240,4 +339,6 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     public void permissionsDenied() {
         Toast.makeText(this, "Permissions Denied!", Toast.LENGTH_SHORT).show();
     }
+
+
 }
