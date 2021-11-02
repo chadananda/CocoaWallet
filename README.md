@@ -9,9 +9,10 @@ Soon to be to be the friendliest self-funding privacy wallet.
 * Milestone 1: Get XMRIG to execute inside APK
   * Is XMRIG running properly? I'm getting no data back.
   * It might be necessary to compile XMRIG on ARM64 phone
-  * What is the final config being used?
+  * compile on android: https://github.com/upost/MoneroMiner/issues/6
 
-* Milestone 2: Refactor code, possibly replace with something NOT so JAVA
+
+* Milestone 2: Refactor code to be simple and clean
   * feature: turn off mining when not plugged, turn on automatically when plugged
   * feature: turn off when battery low, turn on when battery reaches >25%
   * simplify settings with default configs somewhere easy to edit
@@ -29,7 +30,6 @@ Soon to be to be the friendliest self-funding privacy wallet.
     * test with: https://www.virustotal.com/
 
 * Milestone 5: Wrap XMRIGCC controller app in simple APK
-  * compile on android: https://github.com/upost/MoneroMiner/issues/6
   * XMRIGCC: https://github.com/untoreh/xmrigCC
   * show connection key in QR code, with scanner in wallet
   * works over local network for network
