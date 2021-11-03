@@ -21,8 +21,13 @@ Soon to be to be the friendliest self-funding privacy wallet.
 * Milestone 3: Drastically improve UI with live graph of hash activity
   * See wireframe below
   * Also add link to view total wallet activity on moneroocean
+  * Coin API from CoinCalulators.io, ex: (save values and update every hour or two)
+    * https://www.coincalculators.io/api?name=dero&hashrate=2500&power=30&poolfee=.01&powercost=0.06
+    * returns a JSON including:
+      * "rewardsInMonth": 1.6642676599849622
+      * "revenueInMonthUSD": 29.321479324996904
 
-* Milestone 4: Create script to download and compile XMRIG using ARM64 container
+* Milestone 4: Build new XMRIG using ARM64 container
   * Replace XMRIG with XMRIGCC
   * Patch code to remove XMRIG base pool fee
   * Compile with obfuscation to avoid virus warnings
