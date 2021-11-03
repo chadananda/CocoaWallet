@@ -22,6 +22,7 @@ Soon to be to be the friendliest self-funding privacy wallet.
   * See wireframe below
   * Also add link to view total wallet activity on moneroocean
   * Coin API from CoinCalulators.io, ex: (save values and update every hour or two)
+    * https://www.coincalculators.io/api
     * https://www.coincalculators.io/api?name=dero&hashrate=2500&power=30&poolfee=.01&powercost=0.06
     * returns a JSON including:
       * "rewardsInMonth": 1.6642676599849622
