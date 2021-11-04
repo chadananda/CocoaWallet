@@ -163,15 +163,14 @@ public class MiningService extends Service {
             // run it!
             Process process = pb.start();   // how do we check if this worked?
 
-            Log.i("pbcmd","cmd: "+pb.command());
-            Log.i("pbcmd","directory: "+pb.directory());
-
-            outputHandler = new MiningService.OutputReaderThread(process.getErrorStream());
-            outputHandler.start();
+            // Log.i("pbcmd","cmd: "+pb.command());
+            // Log.i("pbcmd","directory: "+pb.directory());
+            // outputHandler = new MiningService.OutputReaderThread(process.getErrorStream());
+            // outputHandler.start();
 
             // start processing xmrig's output    // so why not use pb.redirectOutput(); ?
-//            outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
-//            outputHandler.start();
+            outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
+            outputHandler.start();
 
             Toast.makeText(this, "started", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
