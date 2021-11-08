@@ -73,7 +73,6 @@ public class MiningService extends Service {
         //copy binaries to a path where we may execute it);
         Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrig");
         Tools.copyFile(this,"armeabi-v7a" + "/libuv", privatePath + "/libuv.so");
-
         //Tools.copyFile(this,"libc++.so",  privatePath + "/libc++_shared.so");
         //Tools.copyFile(this,"libdl.so",  privatePath + "/libc++_shared.so");
     }
@@ -134,7 +133,7 @@ public class MiningService extends Service {
             process.destroy();
             process = null;
             Log.i(LOG_TAG, "stopped");
-            Toast.makeText(this, "stopped", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"stopped", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -208,7 +207,7 @@ public class MiningService extends Service {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     Log.i("prog", line); //never gets called
-                    output.append(line + System.lineSeparator());
+                    output.append(line).append(System.lineSeparator());
                     if (line.contains("accepted")) {
                         accepted++;
                     } else if (line.contains("speed")) {

@@ -29,10 +29,12 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -46,33 +48,51 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.Viewport;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.LongFunction;
 
 public class MainActivity extends Activity implements PermissionUtil.PermissionsCallBack{
     private final static String[] SUPPORTED_ARCHITECTURES = {"arm64-v8a", "armeabi-v7a"};
     private ScheduledExecutorService svc;
-    private ImageView imageview;
-    private TextView tvLog;
+    private ImageView imageview,screenshotimage,controller_scanner,paywallet_scanner;
+    private TextView tvLog,cpu,back;
     private EditText edPool,edUser;
     private EditText  edThreads, edMaxCpu;
-    private TextView tvSpeed,tvAccepted;
-    private CheckBox cbUseWorkerId;
-    private Button screenshot;
+    private TextView tvSpeed,tvAccepted,controller,contribution_percent,threads_percent;
+    private CheckBox cbUseWorkerId,no_sleep,plugged_only;
+    private Button screenshot,done;
+    private Uri fileUri;
+    private LinearLayout wholedata;
     private boolean validArchitecture = true;
     private MiningService.MiningServiceBinder binder;
     public static final int PERMISSION_WRITE = 0;
+    private IntentIntegrator scanner;
+    private SeekBar contribution_seek,threads_seek;
+    GraphView graphView;
+    private String speed;
 
+    @SuppressLint("ResourceAsColor")
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,53 +106,164 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         edUser = findViewById(R.id.username);
         edThreads = findViewById(R.id.threads);
         edMaxCpu = findViewById(R.id.maxcpu);
-        imageview = findViewById(R.id.imageView);
+        cpu = findViewById(R.id.cpu);
+       //imageview = findViewById(R.id.imageView);
         cbUseWorkerId = findViewById(R.id.use_worker_id);
-        screenshot=findViewById(R.id.screenshot);
+        screenshotimage=findViewById(R.id.screenshotImage);
+        controller_scanner=findViewById(R.id.controller_scanner);
+        wholedata=findViewById(R.id.wholedata);
+        controller=findViewById(R.id.controller);
+        back = findViewById(R.id.back);
+        ImageView shareButton = (ImageView) findViewById(R.id.share);
         enableButtons(true);
 
+        //cpu.setText("Snap Dragon  "+edMaxCpu.getText().toString());
 
-        Button popup = findViewById(R.id.popup);
+        Log.e("speed","speed"+tvLog);
+
+
+
+        graphView = findViewById(R.id.graph);
+
+        // on below line we are adding data to our graph view.
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[]{
+                // on below line we are adding
+                // each point on our x and y axis.
+                new DataPoint(0, 0),
+                new DataPoint(0, 16)
+
+        });
+
+        // after adding data to our line graph series.
+        // on below line we are setting
+        // title for our graph view.
+        graphView.setTitle("Time Graph View");
+
+        // on below line we are setting
+        // text color to our graph view.
+        graphView.setTitleColor(R.color.colorPrimary);
+
+        // on below line we are setting
+        // our title text size.
+        graphView.setTitleTextSize(18);
+
+        // on below line we are adding
+        // data series to our graph view.
+        graphView.addSeries(series);
+
+        series.setColor(R.color.colorPrimary);
+        series.setDrawBackground(true);
+        series.setDrawDataPoints(true);
+        graphView.addSeries(series);
+
+
+
+
+
+
+
+
+
+
+        TextView popup = findViewById(R.id.settings);
         popup.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public void onClick(View v) {
                 LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-                View popupView = inflater.inflate(R.layout.popup, null);
-
+                View customView  = inflater.inflate(R.layout.popup, null);
+                controller_scanner = (ImageView) customView.findViewById(R.id.controller_scanner);
+                paywallet_scanner = (ImageView) customView.findViewById(R.id.paywallet_scanner);
+                done = (Button) customView.findViewById(R.id.done);
+                contribution_seek = (SeekBar) customView.findViewById(R.id.contribution_seek);
+                threads_seek = (SeekBar) customView.findViewById(R.id.threads_seek);
+                contribution_percent = (TextView) customView.findViewById(R.id.contribution_percent);
+                threads_percent = (TextView) customView.findViewById(R.id.threads_percent);
+                no_sleep = (CheckBox) customView.findViewById(R.id.no_sleep);
+                plugged_only = (CheckBox) customView.findViewById(R.id.plugged_only);
                 // create the popup window
                 int width = LinearLayout.LayoutParams.MATCH_PARENT;
                 int height = LinearLayout.LayoutParams.WRAP_CONTENT;
                 boolean focusable = true; // lets taps outside the popup also dismiss it
-                final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
-
+                final PopupWindow popupWindow = new PopupWindow(customView, width, height, focusable);
                 popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
 
+
+                if (no_sleep.isChecked()){
+                    Toast.makeText(MainActivity.this,"No Sleep",Toast.LENGTH_SHORT).show();
+                }
+                if (plugged_only.isChecked()){
+                    Toast.makeText(MainActivity.this,"Plugged Only",Toast.LENGTH_SHORT).show();
+                }
+
+                contribution_seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    int progressChangedValue = 0;
+
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        progressChangedValue = progress;
+                        //Toast.makeText(getApplicationContext(),"Progress"+progress,Toast.LENGTH_SHORT).show();
+                        contribution_percent.setText(" " +progress+"%");
+                    }
+
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                        // TODO Auto-generated method stub
+                    }
+
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        //Toast.makeText(MainActivity.this, "Seek bar progress is :" + progressChangedValue,Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                threads_seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    int progressChangedValue = 0;
+
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        progressChangedValue = progress;
+                        //Toast.makeText(getApplicationContext(),"Progress"+progress,Toast.LENGTH_SHORT).show();
+                        threads_percent.setText(" " +progress+"%");
+                    }
+
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                        // TODO Auto-generated method stub
+                    }
+
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        //Toast.makeText(MainActivity.this, "Seek bar progress is :" + progressChangedValue,Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                done.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        popupWindow.dismiss();
+                    }
+                });
+
                 // dismiss the popup window when touched
-                popupView.setOnTouchListener(new View.OnTouchListener() {
+                controller_scanner.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
-                        popupWindow.dismiss();
+                        scanImage();
+                        return true;
+                    }
+                });
+                paywallet_scanner.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        scanImage();
                         return true;
                     }
                 });
             }
         });
 
-//        Button shareButton = (Button) findViewById(R.id.share_button);
-//        shareButton.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View v) {
-//
-//                Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-//                Uri screenshotUri = Uri.parse(Images.Media.EXTERNAL_CONTENT_URI + "/" + imageIDs);
-//
-//                sharingIntent.setType("image/jpeg");
-//                sharingIntent.putExtra(Intent.EXTRA_STREAM, screenshotUri);
-//                startActivity(Intent.createChooser(sharingIntent, "Share image using"));
-//
-//            }
-//        });
-
-        screenshot.setOnClickListener(new View.OnClickListener() {
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 TakeScreenShot();
@@ -150,22 +281,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 }
             }
 
-//        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.INTERNET},1);
-//            return;
-//                }
-//
-//        if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.INTERNET},1);
-//            return;
-//        }
-//        if(checkSelfPermission(Manifest.permission.INTERNET)
-//                        != PackageManager.PERMISSION_GRANTED) {
-//            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.INTERNET},1);
-//            return;
-//        }
+
 
         if (!Arrays.asList(SUPPORTED_ARCHITECTURES).contains(Build.CPU_ABI.toLowerCase())) {
             Toast.makeText(this, "Sorry, this app currently only supports 64 bit architectures, but yours is " + Build.CPU_ABI, Toast.LENGTH_LONG).show();
@@ -179,6 +295,34 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         startService(intent);
     }
 
+
+
+
+
+
+    private void scanImage() {
+        IntentIntegrator intentIntegrator = new IntentIntegrator(this);
+        intentIntegrator.setPrompt("Scan a barcode or QR Code");
+        intentIntegrator.setOrientationLocked(true);
+        intentIntegrator.initiateScan();
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (intentResult != null) {
+            if (intentResult.getContents() == null) {
+                Toast.makeText(getBaseContext(), "Cancelled", Toast.LENGTH_SHORT).show();
+            } else {
+                Log.e("lll","lll"+intentResult.getContents()+intentResult.getFormatName());
+
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
 
 
     @Override
@@ -214,16 +358,29 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         else {
             Log.e("start","start: "+binder);
             if (binder == null) return;
-            MiningService.MiningConfig cfg = binder.getService().newConfig(edUser.getText().toString(), edPool.getText().toString(),
-                    Integer.parseInt(edThreads.getText().toString()), Integer.parseInt(edMaxCpu.getText().toString()), cbUseWorkerId.isChecked());
+            MiningService.MiningConfig cfg = binder.getService().newConfig(
+                    edUser.getText().toString(),
+                   //" 8AaNnN8nQUMh3XQfyt4kEt8TR7RYnowhjVynzShWwVLiR6dWdSp42YeFvouLZoui7S46xSgDxapbeS7Tdqyz7em5Chqd4HA",
+
+                    edPool.getText().toString(),
+                    //"gulf.moneroocean.stream:10001",
+                    Integer.parseInt(
+                            edThreads.getText().toString()
+                            //"3"
+                    ), Integer.parseInt(
+                            edMaxCpu.getText().toString()
+                            //"80"
+                    ), cbUseWorkerId.isChecked());
             // Log.e("start","cfg: "+cfg.toString());
             binder.getService().startMining(cfg);
 
         }
+
     }
 
 
     public void TakeScreenShot() {
+
         try {
             File mydir = new File(Environment.getExternalStorageDirectory() + "/11zon");
             if (!mydir.exists()) {
@@ -234,18 +391,55 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
             view.setDrawingCacheEnabled(true);
             Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache());
             view.setDrawingCacheEnabled(false);
-
-            Uri fileUri = Uri.parse(mydir.getAbsolutePath() + File.separator + "IMG_" + System.currentTimeMillis() + ".jpg");
+            fileUri = Uri.parse(mydir.getAbsolutePath() + File.separator + "IMG_" + System.currentTimeMillis() + ".jpg");
             FileOutputStream outputStream = new FileOutputStream(String.valueOf(fileUri));
-
+            //screenshotimage.setVisibility(View.VISIBLE);
+            wholedata.setVisibility(View.GONE);
+            screenshotimage.setVisibility(View.VISIBLE);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             outputStream.flush();
             outputStream.close();
-            Log.e("uri","uri"+fileUri);
-            imageview.setImageURI(fileUri);
+            //imageview.setImageURI(fileUri);
+            screenshotimage.setVisibility(View.VISIBLE);
+            screenshotimage.setImageURI(fileUri);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    screenshotimage.setVisibility(View.GONE);
+                    wholedata.setVisibility(View.VISIBLE);
+                }
+            }, 1500);
         } catch(IOException e) {
             e.printStackTrace();
         }
+
+        final MediaPlayer mp = MediaPlayer.create(this, R.raw.camera_sound);
+                mp.start();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mp.stop();
+            }
+        }, 1000);
+
+
+        //share code
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("image/*");
+                String shareBody = "Cocoawallet Screenshot";
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Screenshot");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                sharingIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                startActivity(Intent.createChooser(sharingIntent, "Share via"));
+                Log.e("uri","uri"+fileUri);
+            }
+        }, 3000);
+
+
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -277,6 +471,8 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         // the executor which will load and display the service status regularly
         svc = Executors.newSingleThreadScheduledExecutor();
         svc.scheduleWithFixedDelay(this::updateLog, 1, 1, TimeUnit.SECONDS);
+
+
     }
 
     @Override
@@ -325,7 +521,8 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 tvLog.setText(binder.getService().getOutput());
                 tvAccepted.setText(Integer.toString(binder.getService().getAccepted()));
                 tvSpeed.setText(binder.getService().getSpeed());
-                Log.e("aa","aa"+binder.getService().getOutput());
+                speed=binder.getService().getSpeed();
+                Log.e("aa","aaa"+binder.getService().getSpeed());
             }
         });
     }
@@ -339,6 +536,4 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     public void permissionsDenied() {
         Toast.makeText(this, "Permissions Denied!", Toast.LENGTH_SHORT).show();
     }
-
-
 }

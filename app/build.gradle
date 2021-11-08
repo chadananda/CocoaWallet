@@ -8,7 +8,7 @@ android {
     }
     defaultConfig {
         applicationId "com.chadananda.cocoawallet"
-        minSdkVersion 19
+        minSdkVersion 24
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
         versionCode 1
@@ -54,5 +54,7 @@ android {
 dependencies {
 implementation 'androidx.annotation:annotation:1.2.0'
     implementation 'androidx.core:core:1.6.0'
-    implementation 'com.android.support:cardview-v7:27.1.1'
+    implementation 'com.android.support:cardview-v7:28.0.0'
+    implementation 'com.journeyapps:zxing-android-embedded:4.2.0'
+    implementation 'com.jjoe64:graphview:4.2.2'
 }
