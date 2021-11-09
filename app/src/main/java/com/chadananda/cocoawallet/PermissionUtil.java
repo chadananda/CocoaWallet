@@ -44,7 +44,6 @@ public class PermissionUtil {
             return true;
         }
 
-
         /**
          * Handle the result of permission request, should be called from the calling {@link Activity}'s
          * {@link ActivityCompat.OnRequestPermissionsResultCallback#onRequestPermissionsResult(int, String[], int[])}
@@ -55,6 +54,8 @@ public class PermissionUtil {
          * @param grantResults results of request.
          * @param callBack Callback interface to receive the result of permission request.
          */
+
+
         public static void onRequestPermissionsResult(final Activity activity, int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults, final PermissionsCallBack callBack) {
             if (requestCode == PermissionUtil.REQUEST_CODE_PERMISSIONS && grantResults.length > 0) {
                 final List<String> permissionsList = new ArrayList<>();

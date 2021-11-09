@@ -16,7 +16,6 @@
 // *    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // * /
 // */
-
 package com.chadananda.cocoawallet;
 
 import android.app.Service;
@@ -72,11 +71,10 @@ public class MiningService extends Service {
 
 
         //copy binaries to a path where we may execute it);
-        Tools.copyFile(this,"arm64-v8a" + "/xmrig", privatePath + "/xmrig");
-        Tools.copyFile(this,"arm64-v8a" + "/libuv", privatePath + "/libuv.so");
-
-//        Tools.copyFile(this,"libc++.so",  privatePath + "/libc++_shared.so");
-//        Tools.copyFile(this,"libdl.so",  privatePath + "/libc++_shared.so");
+        Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrig");
+        Tools.copyFile(this,"armeabi-v7a" + "/libuv", privatePath + "/libuv.so");
+        //Tools.copyFile(this,"libc++.so",  privatePath + "/libc++_shared.so");
+        //Tools.copyFile(this,"libdl.so",  privatePath + "/libc++_shared.so");
     }
 
     public class MiningServiceBinder extends Binder {
@@ -135,7 +133,7 @@ public class MiningService extends Service {
             process.destroy();
             process = null;
             Log.i(LOG_TAG, "stopped");
-            Toast.makeText(this, "stopped", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"stopped", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -148,39 +146,34 @@ public class MiningService extends Service {
         try {
             // write the config
             Tools.writeConfig(configTemplate, config.pool, config.username, config.threads, config.maxCpu, privatePath);
-//            Log.i(LOG_TAG, "private path: "+privatePath);
-            // run xmrig using the config
+            //run xmrig using the config
             String[] args = {"./xmrig"};
             ProcessBuilder pb = new ProcessBuilder(args);
-            // in our directory
+            //in our directory
             pb.directory(getApplicationContext().getFilesDir());
             // with the directory as ld path so xmrig finds the libs
             pb.environment().put("LD_LIBRARY_PATH", privatePath);
-            // in case of errors, read them
+            //in case of errors, read them
             pb.redirectErrorStream();
             accepted = 0;
-
-            // run it!
+            //run it!
             Process process = pb.start();   // how do we check if this worked?
 
+            //start processing xmrig's output    // so why not use pb.redirectOutput(); ?
             // Log.i("pbcmd","cmd: "+pb.command());
             // Log.i("pbcmd","directory: "+pb.directory());
             // outputHandler = new MiningService.OutputReaderThread(process.getErrorStream());
             // outputHandler.start();
 
-            // start processing xmrig's output    // so why not use pb.redirectOutput(); ?
             outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
             outputHandler.start();
-
             Toast.makeText(this, "started", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Log.e("error","error"+e.getLocalizedMessage()+e.getCause());
             Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             process = null;
         }
-
     }
-
 
     public String getSpeed() {
         return speed;
@@ -200,7 +193,6 @@ public class MiningService extends Service {
         return Runtime.getRuntime().availableProcessors();
     }
 
-
     /**
      * thread to collect the binary's output
      */
@@ -215,13 +207,13 @@ public class MiningService extends Service {
         }
 
         public void run() {
-            Log.i("prog", "running");
+            Log.e("prog", "running");
             try {
                 reader = new BufferedReader(new InputStreamReader(inputStream));
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    Log.i("prog", line); // never gets called
-                    output.append(line + System.lineSeparator());
+                    Log.i("prog", line); //never gets called
+                    output.append(line).append(System.lineSeparator());
                     if (line.contains("accepted")) {
                         accepted++;
                     } else if (line.contains("speed")) {
