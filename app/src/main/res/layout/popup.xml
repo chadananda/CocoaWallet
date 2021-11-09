@@ -60,7 +60,7 @@
                         android:textColor="@android:color/darker_gray"
                         tools:ignore="HardcodedText" />
                     <TextView
-                        android:id="@+id/device_id"
+                        android:id="@+id/device_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="16sp"
@@ -88,7 +88,7 @@
                         android:textColor="@android:color/darker_gray"
                         tools:ignore="HardcodedText" />
                     <TextView
-                        android:id="@+id/controller"
+                        android:id="@+id/controllerscan"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="16sp"
@@ -184,7 +184,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="16sp"
-                            android:text="  50%"
+                            android:text="  25%"
                             android:textColor="@android:color/black"
                             tools:ignore="HardcodedText" />
 
@@ -246,7 +246,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginTop="10dp">
+                        android:layout_marginTop="10dp"
+                        android:paddingBottom="-2dp"
+                        >
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -296,7 +298,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="16sp"
-                            android:text="  50%"
+                            android:text="  25%"
                             android:textColor="@android:color/black"
                             tools:ignore="HardcodedText" />
 

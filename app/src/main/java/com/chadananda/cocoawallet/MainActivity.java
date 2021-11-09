@@ -46,6 +46,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -82,9 +83,8 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     private ScheduledExecutorService svc;
     private ImageView imageview,screenshotimage,controller_scanner,paywallet_scanner;
     private TextView tvLog,cpu,back;
-    private EditText edPool,edUser;
-    private EditText  edThreads, edMaxCpu;
-    private TextView tvSpeed,tvAccepted,controller,contribution_percent,threads_percent;
+    private EditText edPool,edUser,edThreads, edMaxCpu;
+    private TextView tvSpeed,tvAccepted,controller,contribution_percent,threads_percent,device_name,device_name1,paywallet1,controllerscan;
     private CheckBox cbUseWorkerId;
     private Switch no_sleep,plugged_only;
     private Button screenshot,done;
@@ -97,9 +97,13 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     private SeekBar contribution_seek,threads_seek;
     GraphView graphView;
     private String speed;
-    String no_sleep1,plugged_only1;
-    private String onoff;
+    String no_sleep1,plugged_only1,wallet123,controller123;
+    private String onoff,wallet,control;
     Boolean usbCharge;
+    private int threadspercent;
+    private int threads;
+    private Button openurl;
+    private WebView showurl;
 
     @SuppressLint("ResourceAsColor")
     @TargetApi(Build.VERSION_CODES.M)
@@ -121,48 +125,39 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         screenshotimage=findViewById(R.id.screenshotImage);
         controller_scanner=findViewById(R.id.controller_scanner);
         wholedata=findViewById(R.id.wholedata);
-        controller=findViewById(R.id.controller);
         back = findViewById(R.id.back);
+        openurl = findViewById(R.id.openurl);
         ImageView shareButton = (ImageView) findViewById(R.id.share);
+        device_name1 = (TextView) findViewById(R.id.device_name1);
         enableButtons(true);
-
-
-
 
         //cpu.setText("Snap Dragon  "+edMaxCpu.getText().toString());
 
+        ///show device name
+        String deviceName = android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL;
+        device_name1.setText(deviceName);
+
+        ///open url
+        openurl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com")));
+            }
+        });
+
         Log.e("speed","speed"+tvLog);
 
-
-
         graphView = findViewById(R.id.graph);
-
-        // on below line we are adding data to our graph view.
         LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[]{
                 // on below line we are adding
                 // each point on our x and y axis.
                 new DataPoint(0, 0),
-                new DataPoint(0, 16)
-
+                new DataPoint(0, 20)
         });
 
-        // after adding data to our line graph series.
-        // on below line we are setting
-        // title for our graph view.
         graphView.setTitle("Time Graph View");
-
-        // on below line we are setting
-        // text color to our graph view.
         graphView.setTitleColor(R.color.colorPrimary);
-
-        // on below line we are setting
-        // our title text size.
         graphView.setTitleTextSize(18);
-
-        // on below line we are adding
-        // data series to our graph view.
-        graphView.addSeries(series);
-
         series.setColor(R.color.colorPrimary);
         series.setDrawBackground(true);
         series.setDrawDataPoints(true);
@@ -170,16 +165,9 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
 
 
 
-
-
-
-
-
-
-
         TextView popup = findViewById(R.id.settings);
         popup.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("ClickableViewAccessibility")
+            @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
             @Override
             public void onClick(View v) {
                 LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -193,6 +181,11 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 threads_percent = (TextView) customView.findViewById(R.id.threads_percent);
                 no_sleep = (Switch) customView.findViewById(R.id.nosleepSwitch);
                 plugged_only = (Switch) customView.findViewById(R.id.pluggedonlySwitch);
+                device_name = (TextView) customView.findViewById(R.id.device_name);
+                device_name1 = (TextView) customView.findViewById(R.id.device_name1);
+                paywallet1 = (TextView) customView.findViewById(R.id.paywallet1);
+                controllerscan=(TextView) customView.findViewById(R.id.controllerscan);
+
                 // create the popup window
                 int width = LinearLayout.LayoutParams.MATCH_PARENT;
                 int height = LinearLayout.LayoutParams.WRAP_CONTENT;
@@ -200,23 +193,32 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 final PopupWindow popupWindow = new PopupWindow(customView, width, height, focusable);
                 popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
 
-
-
                 SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref", MODE_PRIVATE);
-                SharedPreferences.Editor myEdit = sharedPreferences.edit();
-
-                // write all the data entered by the user in SharedPreference and apply
-                myEdit.putString("onff", no_sleep1);
-                myEdit.apply();
                 onoff = sharedPreferences.getString("onff","");
-                Log.e("true","true"+onoff);
-
+                wallet = sharedPreferences.getString("wallet123","");
+                threads = sharedPreferences.getInt("threads",0);
+                control= sharedPreferences.getString("controller123","");
+                if (sharedPreferences.equals("")){
+                   Toast.makeText(getApplicationContext(),"DATA is Empty",Toast.LENGTH_SHORT).show();
+                }else {
+                    threads_percent.setText(" "+threads+"%");
+                    threads_seek.setProgress(threads);
+                    paywallet1.setText(wallet+"....");
+                    controllerscan.setText(control+"....");
+                }
                 ///check no sleep
-                if (onoff.equals("ON")){
+                if (onoff=="ON"){
                     no_sleep.setChecked(true);
                 }else {
                     no_sleep.setChecked(false);
                 }
+
+
+                ///show device name
+                String deviceName = android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL;
+                device_name.setText(deviceName);
+
+
 
                 ///check for charging
                 IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
@@ -238,7 +240,63 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                             "Mobile charging off", Toast.LENGTH_LONG).show();
                 }
 
+                //contribution seek bar
+                contribution_seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    int progressChangedValue = 0;
 
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        progressChangedValue = progress;
+                        //Toast.makeText(getApplicationContext(),"Progress"+progress,Toast.LENGTH_SHORT).show();
+                        contribution_percent.setText(" " +progress+"%");
+
+                    }
+
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                        // TODO Auto-generated method stub
+                    }
+
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        //Toast.makeText(MainActivity.this, "Seek bar progress is :" + progressChangedValue,Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
+                //threads seek bar
+                threads_seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    int progressChangedValue = 0;
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        progressChangedValue = progress;
+                        //Toast.makeText(getApplicationContext(),"Progress"+progress,Toast.LENGTH_SHORT).show();
+                        threads_percent.setText(" "+progress+"%");
+                        threadspercent=progress;
+
+                    }
+
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                        //TODO Auto-generated method stub
+                    }
+
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        //Toast.makeText(MainActivity.this, "Seek bar progress is :" + progressChangedValue,Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
+                // dismiss the popup window when touched
+                controller_scanner.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        scanImage();
+                        return true;
+                    }
+                });
+                paywallet_scanner.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        scanImage();
+                        return true;
+                    }
+                });
 
                 ///check for done
                 done.setOnClickListener(new View.OnClickListener() {
@@ -246,70 +304,31 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                     public void onClick(View v) {
                         popupWindow.dismiss();
 
+                        SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref", MODE_PRIVATE);
+                        SharedPreferences.Editor myEdit = sharedPreferences.edit();
+                        myEdit.putString("onff", no_sleep1);
+                        myEdit.putString("wallet123", wallet123);
+                        myEdit.putString("controller123", controller123);
+                        myEdit.putInt("threads",threadspercent);
+                        myEdit.apply();
+                        onoff = sharedPreferences.getString("onff","");
+                        wallet = sharedPreferences.getString("wallet123","");
+                        threads = sharedPreferences.getInt("threads",0);
+                        control= sharedPreferences.getString("controller123","");
+
+                        threads_percent.setText(" "+threads+"%");
+                        threads_seek.setProgress(threads);
+                        paywallet1.setText(wallet+"....");
+                        controllerscan.setText(control+"....");
+
                         if (no_sleep.isChecked()){
                             no_sleep1 = no_sleep.getTextOn().toString();
-
                             Toast.makeText(getApplication(),"On",Toast.LENGTH_SHORT).show();
                             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                         } else {
-                            Toast.makeText(getApplication(),"Off",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplication(),"Sleep Mode Off",Toast.LENGTH_SHORT).show();
                             no_sleep1 = no_sleep.getTextOff().toString();
                         }
-
-
-
-
-                        contribution_seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                            int progressChangedValue = 0;
-
-                            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                                progressChangedValue = progress;
-                                //Toast.makeText(getApplicationContext(),"Progress"+progress,Toast.LENGTH_SHORT).show();
-                                contribution_percent.setText(" " +progress+"%");
-                            }
-
-                            public void onStartTrackingTouch(SeekBar seekBar) {
-                                // TODO Auto-generated method stub
-                            }
-
-                            public void onStopTrackingTouch(SeekBar seekBar) {
-                                //Toast.makeText(MainActivity.this, "Seek bar progress is :" + progressChangedValue,Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-                        threads_seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                            int progressChangedValue = 0;
-
-                            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                                progressChangedValue = progress;
-                                //Toast.makeText(getApplicationContext(),"Progress"+progress,Toast.LENGTH_SHORT).show();
-                                threads_percent.setText(" " +progress+"%");
-                            }
-
-                            public void onStartTrackingTouch(SeekBar seekBar) {
-                                // TODO Auto-generated method stub
-                            }
-
-                            public void onStopTrackingTouch(SeekBar seekBar) {
-                                //Toast.makeText(MainActivity.this, "Seek bar progress is :" + progressChangedValue,Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-                        // dismiss the popup window when touched
-                        controller_scanner.setOnTouchListener(new View.OnTouchListener() {
-                            @Override
-                            public boolean onTouch(View v, MotionEvent event) {
-                                scanImage();
-                                return true;
-                            }
-                        });
-                        paywallet_scanner.setOnTouchListener(new View.OnTouchListener() {
-                            @Override
-                            public boolean onTouch(View v, MotionEvent event) {
-                                scanImage();
-                                return true;
-                            }
-                        });
                     }
                 });
 
@@ -349,6 +368,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
             validArchitecture = false;
         }
 
+
         // run the service
         Intent intent = new Intent(this, MiningService.class);
         bindService(intent, serverConnection, BIND_AUTO_CREATE);
@@ -376,8 +396,16 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
             if (intentResult.getContents() == null) {
                 Toast.makeText(getBaseContext(), "Cancelled", Toast.LENGTH_SHORT).show();
             } else {
-                Log.e("lll","lll"+intentResult.getContents()+intentResult.getFormatName());
-
+                Log.e("lll","lll"+intentResult.getContents());
+                if (intentResult.getContents().length() > 30) {
+                    String substring = intentResult.getContents().substring(0,5);
+                    paywallet1.setText(substring+"....");
+                    wallet123=substring.toString();
+                }else {
+                    String substring = intentResult.getContents().substring(0,5);
+                    controllerscan.setText(substring+"....");
+                    controller123=substring.toString();
+                }
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -395,6 +423,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     }
 
     private void startMining(View view) {
+        Log.e("start","start"+threadspercent);
         requestPermission();
         if (edUser.getText().toString().isEmpty()){
             Toast.makeText(this,"Enter UserName",Toast.LENGTH_SHORT).show();
@@ -403,10 +432,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         {
             Toast.makeText(this,"Enter Pool Address",Toast.LENGTH_SHORT).show();
         }
-        else if (edThreads.getText().toString().isEmpty())
-        {
-            Toast.makeText(this,"Enter Threads",Toast.LENGTH_SHORT).show();
-        }
+
         else if (edMaxCpu.getText().toString().isEmpty())
         {
             Toast.makeText(this,"Enter MaxCpu",Toast.LENGTH_SHORT).show();
@@ -425,7 +451,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                     edPool.getText().toString(),
                     //"gulf.moneroocean.stream:10001",
                     Integer.parseInt(
-                            edThreads.getText().toString()
+                            String.valueOf(threadspercent)
                             //"3"
                     ), Integer.parseInt(
                             edMaxCpu.getText().toString()
@@ -555,8 +581,8 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 //write suggested cores usage into editText
                 int suggested = cores / 2;
                 if (suggested == 0) suggested = 1;
-                edThreads.getText().clear();
-                edThreads.getText().append(Integer.toString(suggested));
+                //edThreads.getText().clear();
+                //edThreads.getText().append(Integer.toString(suggested));
                 ((TextView) findViewById(R.id.cpus)).setText(String.format("(%d %s)", cores, getString(R.string.cpus)));
             }
         }
