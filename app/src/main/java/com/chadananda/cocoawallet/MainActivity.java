@@ -26,11 +26,14 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -42,6 +45,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -49,6 +53,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,7 +85,8 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     private EditText edPool,edUser;
     private EditText  edThreads, edMaxCpu;
     private TextView tvSpeed,tvAccepted,controller,contribution_percent,threads_percent;
-    private CheckBox cbUseWorkerId,no_sleep,plugged_only;
+    private CheckBox cbUseWorkerId;
+    private Switch no_sleep,plugged_only;
     private Button screenshot,done;
     private Uri fileUri;
     private LinearLayout wholedata;
@@ -91,6 +97,9 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     private SeekBar contribution_seek,threads_seek;
     GraphView graphView;
     private String speed;
+    String no_sleep1,plugged_only1;
+    private String onoff;
+    Boolean usbCharge;
 
     @SuppressLint("ResourceAsColor")
     @TargetApi(Build.VERSION_CODES.M)
@@ -116,6 +125,9 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         back = findViewById(R.id.back);
         ImageView shareButton = (ImageView) findViewById(R.id.share);
         enableButtons(true);
+
+
+
 
         //cpu.setText("Snap Dragon  "+edMaxCpu.getText().toString());
 
@@ -179,8 +191,8 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 threads_seek = (SeekBar) customView.findViewById(R.id.threads_seek);
                 contribution_percent = (TextView) customView.findViewById(R.id.contribution_percent);
                 threads_percent = (TextView) customView.findViewById(R.id.threads_percent);
-                no_sleep = (CheckBox) customView.findViewById(R.id.no_sleep);
-                plugged_only = (CheckBox) customView.findViewById(R.id.plugged_only);
+                no_sleep = (Switch) customView.findViewById(R.id.nosleepSwitch);
+                plugged_only = (Switch) customView.findViewById(R.id.pluggedonlySwitch);
                 // create the popup window
                 int width = LinearLayout.LayoutParams.MATCH_PARENT;
                 int height = LinearLayout.LayoutParams.WRAP_CONTENT;
@@ -189,71 +201,119 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
 
 
-                if (no_sleep.isChecked()){
-                    Toast.makeText(MainActivity.this,"No Sleep",Toast.LENGTH_SHORT).show();
+
+                SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref", MODE_PRIVATE);
+                SharedPreferences.Editor myEdit = sharedPreferences.edit();
+
+                // write all the data entered by the user in SharedPreference and apply
+                myEdit.putString("onff", no_sleep1);
+                myEdit.apply();
+                onoff = sharedPreferences.getString("onff","");
+                Log.e("true","true"+onoff);
+
+                ///check no sleep
+                if (onoff.equals("ON")){
+                    no_sleep.setChecked(true);
+                }else {
+                    no_sleep.setChecked(false);
                 }
-                if (plugged_only.isChecked()){
-                    Toast.makeText(MainActivity.this,"Plugged Only",Toast.LENGTH_SHORT).show();
+
+                ///check for charging
+                IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+                Intent batteryStatus = registerReceiver(null, ifilter);
+                int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+                // Find the charge Source
+                boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING
+                        || status == BatteryManager.BATTERY_STATUS_FULL;
+                int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+                usbCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
+                boolean acCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
+                if (usbCharge) {
+                    Toast.makeText(getApplicationContext(),
+                            "Mobile is charging on USB", Toast.LENGTH_LONG).show();
+                    plugged_only.setChecked(true);
+
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            "Mobile charging off", Toast.LENGTH_LONG).show();
                 }
 
-                contribution_seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    int progressChangedValue = 0;
 
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        progressChangedValue = progress;
-                        //Toast.makeText(getApplicationContext(),"Progress"+progress,Toast.LENGTH_SHORT).show();
-                        contribution_percent.setText(" " +progress+"%");
-                    }
 
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-                        // TODO Auto-generated method stub
-                    }
-
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                        //Toast.makeText(MainActivity.this, "Seek bar progress is :" + progressChangedValue,Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-                threads_seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    int progressChangedValue = 0;
-
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        progressChangedValue = progress;
-                        //Toast.makeText(getApplicationContext(),"Progress"+progress,Toast.LENGTH_SHORT).show();
-                        threads_percent.setText(" " +progress+"%");
-                    }
-
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-                        // TODO Auto-generated method stub
-                    }
-
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                        //Toast.makeText(MainActivity.this, "Seek bar progress is :" + progressChangedValue,Toast.LENGTH_SHORT).show();
-                    }
-                });
-
+                ///check for done
                 done.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         popupWindow.dismiss();
+
+                        if (no_sleep.isChecked()){
+                            no_sleep1 = no_sleep.getTextOn().toString();
+
+                            Toast.makeText(getApplication(),"On",Toast.LENGTH_SHORT).show();
+                            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                        } else {
+                            Toast.makeText(getApplication(),"Off",Toast.LENGTH_SHORT).show();
+                            no_sleep1 = no_sleep.getTextOff().toString();
+                        }
+
+
+
+
+                        contribution_seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                            int progressChangedValue = 0;
+
+                            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                                progressChangedValue = progress;
+                                //Toast.makeText(getApplicationContext(),"Progress"+progress,Toast.LENGTH_SHORT).show();
+                                contribution_percent.setText(" " +progress+"%");
+                            }
+
+                            public void onStartTrackingTouch(SeekBar seekBar) {
+                                // TODO Auto-generated method stub
+                            }
+
+                            public void onStopTrackingTouch(SeekBar seekBar) {
+                                //Toast.makeText(MainActivity.this, "Seek bar progress is :" + progressChangedValue,Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        threads_seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                            int progressChangedValue = 0;
+
+                            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                                progressChangedValue = progress;
+                                //Toast.makeText(getApplicationContext(),"Progress"+progress,Toast.LENGTH_SHORT).show();
+                                threads_percent.setText(" " +progress+"%");
+                            }
+
+                            public void onStartTrackingTouch(SeekBar seekBar) {
+                                // TODO Auto-generated method stub
+                            }
+
+                            public void onStopTrackingTouch(SeekBar seekBar) {
+                                //Toast.makeText(MainActivity.this, "Seek bar progress is :" + progressChangedValue,Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        // dismiss the popup window when touched
+                        controller_scanner.setOnTouchListener(new View.OnTouchListener() {
+                            @Override
+                            public boolean onTouch(View v, MotionEvent event) {
+                                scanImage();
+                                return true;
+                            }
+                        });
+                        paywallet_scanner.setOnTouchListener(new View.OnTouchListener() {
+                            @Override
+                            public boolean onTouch(View v, MotionEvent event) {
+                                scanImage();
+                                return true;
+                            }
+                        });
                     }
                 });
 
-                // dismiss the popup window when touched
-                controller_scanner.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        scanImage();
-                        return true;
-                    }
-                });
-                paywallet_scanner.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        scanImage();
-                        return true;
-                    }
-                });
+
             }
         });
 
