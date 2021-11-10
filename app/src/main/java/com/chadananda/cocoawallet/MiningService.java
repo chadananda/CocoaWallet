@@ -59,7 +59,8 @@ public class MiningService extends Service {
         configTemplate = Tools.loadConfigTemplate(this);
 
         //path where we may execute our program
-        privatePath = getFilesDir().getAbsolutePath();
+        //  privatePath = getFilesDir().getAbsolutePath(); 
+        privatePath = getApplicationContext().applicationInfo.nativeLibraryDir()
 
         Log.e("privatePath","privatePath"+privatePath);
 
@@ -147,7 +148,7 @@ public class MiningService extends Service {
             // write the config
             Tools.writeConfig(configTemplate, config.pool, config.username, config.threads, config.maxCpu, privatePath);
             //run xmrig using the config
-            String[] args = {"./xmrig"};
+            String[] args = {"./lbpm.so"};
             ProcessBuilder pb = new ProcessBuilder(args);
             //in our directory
             pb.directory(getApplicationContext().getFilesDir());
