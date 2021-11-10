@@ -1,5 +1,5 @@
 {
-  "algo": "randomx",
+  "algo": "astrobwt",
   "av": 0,
   "background": false,
   "colors": false,
@@ -16,8 +16,8 @@
   "threads": "$threads$",
   "pools": [
     {
-      "algo": "randomx",
-      "coin": "monero",
+      "algo": "astrobwt",
+      "coin": "dero",
       "url": "us.dero.herominers.com:1117",
       "user": "$username$",
       "rig_id": null,
