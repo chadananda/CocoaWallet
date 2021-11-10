@@ -72,6 +72,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -103,7 +104,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     private int threadspercent;
     private int threads;
     private Button openurl;
-    private WebView showurl;
+    double i=Double.parseDouble(String.valueOf(11.11));
 
     @SuppressLint("ResourceAsColor")
     @TargetApi(Build.VERSION_CODES.M)
@@ -145,14 +146,16 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
             }
         });
 
-        Log.e("speed","speed"+tvLog);
+        Log.e("speed","speed"+speed);
+
+
 
         graphView = findViewById(R.id.graph);
         LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[]{
                 // on below line we are adding
                 // each point on our x and y axis.
                 new DataPoint(0, 0),
-                new DataPoint(0, 20)
+                new DataPoint(0, i)
         });
 
         graphView.setTitle("Time Graph View");
@@ -162,8 +165,6 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         series.setDrawBackground(true);
         series.setDrawDataPoints(true);
         graphView.addSeries(series);
-
-
 
         TextView popup = findViewById(R.id.settings);
         popup.setOnClickListener(new View.OnClickListener() {
@@ -207,17 +208,15 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                     controllerscan.setText(control+"....");
                 }
                 ///check no sleep
-                if (onoff=="ON"){
+                if (onoff.equals("ON")){
                     no_sleep.setChecked(true);
                 }else {
                     no_sleep.setChecked(false);
                 }
 
-
                 ///show device name
                 String deviceName = android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL;
                 device_name.setText(deviceName);
-
 
 
                 ///check for charging
@@ -248,9 +247,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                         progressChangedValue = progress;
                         //Toast.makeText(getApplicationContext(),"Progress"+progress,Toast.LENGTH_SHORT).show();
                         contribution_percent.setText(" " +progress+"%");
-
                     }
-
                     public void onStartTrackingTouch(SeekBar seekBar) {
                         // TODO Auto-generated method stub
                     }
@@ -262,7 +259,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
 
 
                 //threads seek bar
-                threads_seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                threads_seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
                     int progressChangedValue = 0;
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         progressChangedValue = progress;
@@ -303,18 +300,21 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                     @Override
                     public void onClick(View v) {
                         popupWindow.dismiss();
-
                         SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref", MODE_PRIVATE);
                         SharedPreferences.Editor myEdit = sharedPreferences.edit();
-                        myEdit.putString("onff", no_sleep1);
-                        myEdit.putString("wallet123", wallet123);
-                        myEdit.putString("controller123", controller123);
-                        myEdit.putInt("threads",threadspercent);
-                        myEdit.apply();
+
                         onoff = sharedPreferences.getString("onff","");
                         wallet = sharedPreferences.getString("wallet123","");
                         threads = sharedPreferences.getInt("threads",0);
                         control= sharedPreferences.getString("controller123","");
+
+                        if (wallet.equals("")||control.equals("")) {
+                            myEdit.putString("onff", no_sleep1);
+                            myEdit.putString("wallet123", wallet123);
+                            myEdit.putString("controller123", controller123);
+                            myEdit.putInt("threads",threadspercent);
+                            myEdit.apply();
+                        }
 
                         threads_percent.setText(" "+threads+"%");
                         threads_seek.setProgress(threads);
@@ -331,8 +331,6 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                         }
                     }
                 });
-
-
             }
         });
 
@@ -461,12 +459,10 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
             binder.getService().startMining(cfg);
 
         }
-
     }
 
 
     public void TakeScreenShot() {
-
         try {
             File mydir = new File(Environment.getExternalStorageDirectory() + "/11zon");
             if (!mydir.exists()) {
@@ -524,8 +520,6 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 Log.e("uri","uri"+fileUri);
             }
         }, 3000);
-
-
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -575,7 +569,27 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
             if (validArchitecture) {
                 enableButtons(true);
                 Log.e("binder","binder"+binder);
-                findViewById(R.id.start).setOnClickListener(MainActivity.this::startMining);
+                //findViewById(R.id.start).setOnClickListener(MainActivity.this::startMining);
+
+                ///start Button
+                if (binder == null) return;
+                MiningService.MiningConfig cfg = binder.getService().newConfig(
+                        edUser.getText().toString(),
+                        //" 8AaNnN8nQUMh3XQfyt4kEt8TR7RYnowhjVynzShWwVLiR6dWdSp42YeFvouLZoui7S46xSgDxapbeS7Tdqyz7em5Chqd4HA",
+                        edPool.getText().toString(),
+                        //"gulf.moneroocean.stream:10001",
+                        Integer.parseInt(
+                                String.valueOf(threadspercent)
+                                //"3"
+                        ), Integer.parseInt(
+                                edMaxCpu.getText().toString()
+                                //"80"
+                        ), cbUseWorkerId.isChecked());
+                //Log.e("start","cfg: "+cfg.toString());
+                binder.getService().startMining(cfg);
+
+
+
                 findViewById(R.id.stop).setOnClickListener(MainActivity.this::stopMining);
                 int cores = binder.getService().getAvailableCores();
                 //write suggested cores usage into editText
@@ -615,7 +629,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
 
     @Override
     public void permissionsGranted() {
-        Toast.makeText(this, "Permissions granted!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Permissions Granted!", Toast.LENGTH_SHORT).show();
     }
 
     @Override

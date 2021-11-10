@@ -71,8 +71,11 @@ public class MiningService extends Service {
 
 
         //copy binaries to a path where we may execute it);
+        Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrigCC");
         Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrig");
         Tools.copyFile(this,"armeabi-v7a" + "/libuv", privatePath + "/libuv.so");
+
+        //Tools.copyFile(this,"armeabi-v7a" + "/libuv", privatePath + "/lib*.so");
         //Tools.copyFile(this,"libc++.so",  privatePath + "/libc++_shared.so");
         //Tools.copyFile(this,"libdl.so",  privatePath + "/libc++_shared.so");
     }
