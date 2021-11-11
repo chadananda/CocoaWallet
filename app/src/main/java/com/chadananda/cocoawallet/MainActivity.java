@@ -148,11 +148,8 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         });
 
         //Log.e("speed","speed"+speed);
-
-
-
-
-
+        ///graph line
+        graphView = findViewById(R.id.graph);
         TextView popup = findViewById(R.id.settings);
         popup.setOnClickListener(new View.OnClickListener() {
             @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
@@ -357,6 +354,23 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         Intent intent = new Intent(this, MiningService.class);
         bindService(intent, serverConnection, BIND_AUTO_CREATE);
         startService(intent);
+    }
+
+    private void callGraph(double y) {
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[]{
+                // on below line we are adding
+                // each point on our x and y axis.
+                new DataPoint(0, 0),
+                new DataPoint(0, y)
+        });
+
+        graphView.setTitle("Time Graph View");
+        graphView.setTitleColor(R.color.colorPrimary);
+        graphView.setTitleTextSize(18);
+        series.setColor(R.color.colorPrimary);
+        series.setDrawBackground(true);
+        series.setDrawDataPoints(true);
+        graphView.addSeries(series);
     }
 
     private void scanImage() {
@@ -600,34 +614,18 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 tvAccepted.setText(Integer.toString(binder.getService().getAccepted()));
                 tvSpeed.setText(binder.getService().getSpeed());
                 speed=binder.getService().getSpeed();
-                Log.e("aa","aaa"+binder.getService().getSpeed());
+                Log.e("aa","aaa "+binder.getService().getSpeed());
 
                 if(speed.matches("[0-9]+[\\.]?[0-9]*")){
+                    Log.e("speed","aaa "+speed);
+                    callGraph(Double.parseDouble(speed));
                     SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref", MODE_PRIVATE);
                     SharedPreferences.Editor myEdit = sharedPreferences.edit();
-                    //double myInt = Double.parseDouble(speed);
+                    myEdit.putString("speed", speed);
 
-                    myEdit.putString("speed", String.valueOf(Double.parseDouble(speed)));
                     String speed321 = sharedPreferences.getString("speed","");
-                    double sp=Double.parseDouble(speed321);
-                    Log.e("speed321","speed321"+speed321);
+                    Log.e("speed321","speed1"+speed321);
 
-                    ///graph line
-                    graphView = findViewById(R.id.graph);
-                    LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[]{
-                            // on below line we are adding
-                            // each point on our x and y axis.
-                            new DataPoint(0, 0),
-                            new DataPoint(0, sp)
-                    });
-
-                    graphView.setTitle("Time Graph View");
-                    graphView.setTitleColor(R.color.colorPrimary);
-                    graphView.setTitleTextSize(18);
-                    series.setColor(R.color.colorPrimary);
-                    series.setDrawBackground(true);
-                    series.setDrawDataPoints(true);
-                    graphView.addSeries(series);
                 }
             }
         });
