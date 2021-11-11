@@ -78,6 +78,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
+import java.util.regex.Pattern;
 
 public class MainActivity extends Activity implements PermissionUtil.PermissionsCallBack{
     private final static String[] SUPPORTED_ARCHITECTURES = {"arm64-v8a", "armeabi-v7a"};
@@ -105,7 +106,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     private int threads;
     private Button openurl;
     double i=Double.parseDouble(String.valueOf(11.11));
-
+    int j;
     @SuppressLint("ResourceAsColor")
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -146,25 +147,11 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
             }
         });
 
-        Log.e("speed","speed"+speed);
+        //Log.e("speed","speed"+speed);
 
 
 
-        graphView = findViewById(R.id.graph);
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[]{
-                // on below line we are adding
-                // each point on our x and y axis.
-                new DataPoint(0, 0),
-                new DataPoint(0, i)
-        });
 
-        graphView.setTitle("Time Graph View");
-        graphView.setTitleColor(R.color.colorPrimary);
-        graphView.setTitleTextSize(18);
-        series.setColor(R.color.colorPrimary);
-        series.setDrawBackground(true);
-        series.setDrawDataPoints(true);
-        graphView.addSeries(series);
 
         TextView popup = findViewById(R.id.settings);
         popup.setOnClickListener(new View.OnClickListener() {
@@ -207,6 +194,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                     paywallet1.setText(wallet+"....");
                     controllerscan.setText(control+"....");
                 }
+
                 ///check no sleep
                 if (onoff.equals("ON")){
                     no_sleep.setChecked(true);
@@ -217,7 +205,6 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 ///show device name
                 String deviceName = android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL;
                 device_name.setText(deviceName);
-
 
                 ///check for charging
                 IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
@@ -256,7 +243,6 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                         //Toast.makeText(MainActivity.this, "Seek bar progress is :" + progressChangedValue,Toast.LENGTH_SHORT).show();
                     }
                 });
-
 
                 //threads seek bar
                 threads_seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
@@ -373,17 +359,11 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         startService(intent);
     }
 
-
-
-
-
-
     private void scanImage() {
         IntentIntegrator intentIntegrator = new IntentIntegrator(this);
         intentIntegrator.setPrompt("Scan a barcode or QR Code");
         intentIntegrator.setOrientationLocked(true);
         intentIntegrator.initiateScan();
-
     }
 
     @Override
@@ -551,8 +531,6 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         // the executor which will load and display the service status regularly
         svc = Executors.newSingleThreadScheduledExecutor();
         svc.scheduleWithFixedDelay(this::updateLog, 1, 1, TimeUnit.SECONDS);
-
-
     }
 
     @Override
@@ -623,10 +601,37 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 tvSpeed.setText(binder.getService().getSpeed());
                 speed=binder.getService().getSpeed();
                 Log.e("aa","aaa"+binder.getService().getSpeed());
+
+                if(speed.matches("[0-9]+[\\.]?[0-9]*")){
+                    SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref", MODE_PRIVATE);
+                    SharedPreferences.Editor myEdit = sharedPreferences.edit();
+                    //double myInt = Double.parseDouble(speed);
+
+                    myEdit.putString("speed", String.valueOf(Double.parseDouble(speed)));
+                    String speed321 = sharedPreferences.getString("speed","");
+                    double sp=Double.parseDouble(speed321);
+                    Log.e("speed321","speed321"+speed321);
+
+                    ///graph line
+                    graphView = findViewById(R.id.graph);
+                    LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[]{
+                            // on below line we are adding
+                            // each point on our x and y axis.
+                            new DataPoint(0, 0),
+                            new DataPoint(0, sp)
+                    });
+
+                    graphView.setTitle("Time Graph View");
+                    graphView.setTitleColor(R.color.colorPrimary);
+                    graphView.setTitleTextSize(18);
+                    series.setColor(R.color.colorPrimary);
+                    series.setDrawBackground(true);
+                    series.setDrawDataPoints(true);
+                    graphView.addSeries(series);
+                }
             }
         });
     }
-
     @Override
     public void permissionsGranted() {
         Toast.makeText(this, "Permissions Granted!", Toast.LENGTH_SHORT).show();

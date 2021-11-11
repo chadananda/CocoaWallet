@@ -295,11 +295,10 @@
         <!-- we add graph view to display -->
         <com.jjoe64.graphview.GraphView
             android:id="@+id/graph"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
+            android:layout_width="180dp"
+            android:layout_height="200dp"
             android:layout_gravity="center"
             android:layout_marginTop="10dp"/>
-
 
         <ScrollView
             android:layout_width="match_parent"
@@ -307,7 +306,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_weight="1"
-            android:scrollbars="none">
+            android:scrollbars="none"
+            android:visibility="gone">
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -331,104 +331,108 @@
 
         </ScrollView>
 
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="10dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/start"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_marginLeft="10dp"
-                android:background="@android:color/background_light"
-                android:text="@string/start"
-                android:textColor="@android:color/black"
-                tools:ignore="ButtonStyle,RtlHardcoded" />
-
-            <Button
-                android:id="@+id/stop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_gravity="right"
-                android:layout_marginRight="10dp"
-                android:background="@android:color/background_light"
-                android:gravity="center"
-                android:text="@string/stop"
-                android:textColor="@android:color/black"
-                tools:ignore="ButtonStyle,RelativeOverlap,RtlHardcoded" />
-        </RelativeLayout>
-
-        <LinearLayout
-            android:id="@+id/details"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_alignParentBottom="true"
-            android:weightSum="2"
-            tools:ignore="DisableBaselineAlignment,ObsoleteLayoutParam">
-
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <TextView
-                    android:id="@+id/cpu"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Snap Dragon 888"
-                    android:textColor="@android:color/black"
-                    android:textSize="16dp"
-                    tools:ignore="HardcodedText,SpUsage" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="12 GB - 10.4kh/s - 62"
-                    android:textSize="12dp"
-                    tools:ignore="HardcodedText,SpUsage" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:padding="14dp"
-                android:layout_gravity="right"
-                android:gravity="right"
-                tools:ignore="RtlHardcoded">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Est 2.27/mo"
-                    android:textColor="@android:color/black"
-                    android:textSize="16dp"
-                    tools:ignore="HardcodedText,SpUsage" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="($57.5)"
-                    android:textSize="12dp"
-                    tools:ignore="HardcodedText,SpUsage" />
-
-            </LinearLayout>
-        </LinearLayout>
     </LinearLayout>
 
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/details"
+        android:layout_gravity="center"
+        android:layout_marginBottom="10dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="visible">
+
+        <Button
+            android:id="@+id/start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="10dp"
+            android:background="@android:color/background_light"
+            android:text="@string/start"
+            android:textColor="@android:color/black"
+            tools:ignore="ButtonStyle,RtlHardcoded" />
+
+        <Button
+            android:id="@+id/stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:layout_marginRight="10dp"
+            android:background="@android:color/background_light"
+            android:gravity="center"
+            android:text="@string/stop"
+            android:textColor="@android:color/black"
+            tools:ignore="ButtonStyle,RelativeOverlap,RtlHardcoded" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:weightSum="2"
+
+        tools:ignore="DisableBaselineAlignment,ObsoleteLayoutParam">
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <TextView
+                android:id="@+id/cpu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Snap Dragon 888"
+                android:textColor="@android:color/black"
+                android:textSize="16dp"
+                tools:ignore="HardcodedText,SpUsage" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12 GB - 10.4kh/s - 62"
+                android:textSize="12dp"
+                tools:ignore="HardcodedText,SpUsage" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="14dp"
+            android:layout_gravity="right"
+            android:gravity="right"
+            tools:ignore="RtlHardcoded"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Est 2.27/mo"
+                android:textColor="@android:color/black"
+                android:textSize="16dp"
+                tools:ignore="HardcodedText,SpUsage" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="($57.5)"
+                android:textSize="12dp"
+                tools:ignore="HardcodedText,SpUsage" />
+
+        </LinearLayout>
+    </LinearLayout>
     <ImageView
         android:id="@+id/screenshotImage"
         android:layout_width="match_parent"
