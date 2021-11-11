@@ -6,56 +6,50 @@ Soon to be to be the friendliest self-funding privacy wallet.
 
 ## Development roadmap
 
-* Milestone 1: Get XMRIG to execute inside APK
+1. [ ] Milestone: Get XMRIG to execute inside APK
   * Is XMRIG running properly? I'm getting no data back.
-  * It might be necessary to compile XMRIG on ARM64 phone
-  * What is the final config being used?
+  * After it works with xmrig, replace with pocketMiner
 
-* Milestone 2: Refactor code, possibly replace with something NOT so JAVA
-  * feature: turn off mining when not plugged, turn on automatically when plugged
-  * feature: turn off when battery low, turn on when battery reaches >25%
-  * simplify settings with default configs somewhere easy to edit
-    * contribute wallet, default pool url & port, default wallet
-
-* Milestone 3: Drastically improve UI with live graph of hash activity
-  * See wireframe below
-  * Also add link to view total wallet activity on moneroocean
-
-* Milestone 4: Create script to download and compile XMRIG using ARM64 container
-  * Replace XMRIG with XMRIGCC
-  * Patch code to remove XMRIG base pool fee
-  * Compile with obfuscation to avoid virus warnings
-    * Like: https://securityonline.info/avcleaner-c-c-source-obfuscator-for-antivirus-bypass/
-    * test with: https://www.virustotal.com/
-
-* Milestone 5: Wrap XMRIGCC controller app in simple APK
-  * compile on android: https://github.com/upost/MoneroMiner/issues/6
-  * XMRIGCC: https://github.com/untoreh/xmrigCC
-  * show connection key in QR code, with scanner in wallet
-  * works over local network for network
-  * implment free VPN access if not found over local network
-
-* Milestone 6: Dramatically improve and simplify UI for miner
+2. [ ] Milestone: Dramatically improve and simplify UI for miner
   * expanding settings sections
   * live graph
   * QR code scanner
   * initially with only remote CocoaWallet
   * share screen shot of graph with link
+  * Also add link to view total wallet activity on pool
+  * Coin API from CoinCalulators.io, ex: (save values and update every hour or two)
+    * https://www.coincalculators.io/api
+    * https://www.coincalculators.io/api?name=dero&hashrate=2500&power=30&poolfee=.01&powercost=0.06
+    * returns a JSON including:
+      * "rewardsInMonth": 1.6642676599849622
+      * "revenueInMonthUSD": 29.321479324996904
 
-* Milestone 7: Integrate in basic DERO wallet functionality
+3. [ ] Milestone: Refactor code to be simple and clean
+  * feature: turn off mining when not plugged, turn on automatically when plugged
+  * feature: turn off when battery low, turn on when battery reaches >25%
+  * simplify settings with default configs somewhere easy to edit
+    * contribute wallet, default pool url & port, default wallet
+
+4. [ ] Milestone: Wrap XMRIGCC controller app in simple APK
+  * XMRIGCC: https://github.com/untoreh/xmrigCC
+  * show connection key in QR code, with scanner in wallet
+  * works over local network for network
+  * implment free VPN access if not found over local network
+
+5. [ ] Milestone: Integrate in basic DERO wallet functionality
   * seperate page for mangement
   * include auto-payout level (pays all or excess)
   * archive (hide) wallet which becomes visible again if money is deposited
 
-* Milestone 8: Integrate Monero wallet with exchange
+6. [ ] Milestone: Integrate wallet with some decentralized exchange, like Haveno
 
 
-## Milestone #3 miner-screen UI wireframe
+## Milestone #2 miner-screen UI wireframe
 
 ![Miner screen UI wireframe](miner-mockup.png)
 
 
-## Milestone #7 simple wallet functionality
+## Milestone #5 simple wallet functionality
 
 ![Simple Wallet](simple-wallet-mockup.png)
 

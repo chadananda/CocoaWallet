@@ -22,15 +22,9 @@ package com.chadananda.cocoawallet;
 import android.content.Context;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 /*
@@ -41,23 +35,22 @@ public class Tools {
     /**
      * load the config.json template file
      * @param context
-     * @return
      * @throws IOException
      */
-    public static String loadConfigTemplate(Context context)  {
-        try {
-            StringBuilder buf = new StringBuilder();
-            InputStream json = context.getAssets().open("config.json");
-            BufferedReader in = new BufferedReader(new InputStreamReader(json, "UTF-8"));
-            String str;
-            while ((str = in.readLine()) != null) {
-                buf.append(str);
-            }
-            in.close();
-            return buf.toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public static void loadConfigTemplate(Context context)  {
+//        try {
+//            StringBuilder buf = new StringBuilder();
+//            InputStream json = context.getAssets().open("config.json");
+//            BufferedReader in = new BufferedReader(new InputStreamReader(json, "UTF-8"));
+//            String str;
+//            while ((str = in.readLine()) != null) {
+//                buf.append(str);
+//            }
+//            in.close();
+//            return buf.toString();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     /**
@@ -67,26 +60,26 @@ public class Tools {
      * @param localFilePath
      */
     public static void copyFile(Context context, String assetFilePath, String localFilePath) {
-        try {
-
-            //InputStream in = context.getAssets().open("arm64-v8a/xmrig");
-
-            InputStream in = context.getAssets().open(assetFilePath);
-            FileOutputStream out = new FileOutputStream(localFilePath);
-            int read;
-            byte[] buffer = new byte[4096];
-            byte[] buf = new byte[4096];
-            while ((read = in.read(buf)) > 0) {
-                out.write(buf, 0, read);
-            }
-            out.close();
-            in.close();
-            File bin = new File(localFilePath);
-            bin.setExecutable(true);
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//
+//            //InputStream in = context.getAssets().open("arm64-v8a/xmrig");
+//
+//            InputStream in = context.getAssets().open(assetFilePath);
+//            FileOutputStream out = new FileOutputStream(localFilePath);
+//            int read;
+//            byte[] buffer = new byte[4096];
+//            byte[] buf = new byte[4096];
+//            while ((read = in.read(buf)) > 0) {
+//                out.write(buf, 0, read);
+//            }
+//            out.close();
+//            in.close();
+//            File bin = new File(localFilePath);
+//            bin.setExecutable(true);
+//        }
+//        catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     /**
@@ -99,19 +92,19 @@ public class Tools {
      * @throws IOException
      */
     public static void writeConfig(String configTemplate, String poolUrl, String username, int threads, int maxCpu, String privatePath) {
-        String config = configTemplate.replace("$url$",poolUrl)
-                .replace("$username$", username)
-                .replace("$threads$", Integer.toString(threads))
-                .replace("$maxcpu$", Integer.toString(maxCpu));
-        PrintWriter writer = null;
-        try {
-            writer = new PrintWriter(new FileOutputStream(privatePath+"/config.json"));
-            writer.write(config);
-        } catch (IOException e) {
-            throw  new RuntimeException(e);
-        } finally {
-            if (writer != null) writer.close();
-        }
+//        String config = configTemplate.replace("$url$",poolUrl)
+//                .replace("$username$", username)
+//                .replace("$threads$", Integer.toString(threads))
+//                .replace("$maxcpu$", Integer.toString(maxCpu));
+//        PrintWriter writer = null;
+//        try {
+//            writer = new PrintWriter(new FileOutputStream(privatePath+"/config.json"));
+//            writer.write(config);
+//        } catch (IOException e) {
+//            throw  new RuntimeException(e);
+//        } finally {
+//            if (writer != null) writer.close();
+//        }
     }
 
     public static Map<String, String> getCPUInfo ()   {
