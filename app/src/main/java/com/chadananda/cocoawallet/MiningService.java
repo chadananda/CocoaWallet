@@ -56,7 +56,7 @@ public class MiningService extends Service {
     public void onCreate() {
         super.onCreate();
         // load config template
-        configTemplate = Tools.loadConfigTemplate(this);
+//        configTemplate = Tools.loadConfigTemplate(this);
 
         //path where we may execute our program
         //  privatePath = getFilesDir().getAbsolutePath();
