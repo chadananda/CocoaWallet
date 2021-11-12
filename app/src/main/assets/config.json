@@ -1,0 +1,30 @@
+{
+  "algo": "randomx",
+  "av": 0,
+  "background": false,
+  "colors": false,
+  "cpu-affinity": null,
+  "cpu-priority": 2,
+  "donate-level": 0,
+  "log-file": null,
+  "max-cpu-usage": "$maxcpu$",
+  "print-time": 60,
+  "retries": 5000,
+  "retry-pause": 5,
+  "safe": false,
+  "syslog": false,
+  "threads": "$threads$",
+  "pools": [
+    {
+      "algo": "randomx",
+      "coin": "monero",
+      "url": "gulf.moneroocean.stream:10001",
+      "user": "$username$",
+      "rig_id": null,
+      "pass": "",
+      "nicehash": false,
+      "tls": false,
+      "tls-fingerprint": null
+    }
+  ]
+}
