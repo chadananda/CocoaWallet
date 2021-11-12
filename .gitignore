@@ -8,3 +8,5 @@
 .key/
 .gradle/
 /old/*
+/app/.DS_Store
+/app/libs/.DS_Store
