@@ -23,6 +23,8 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -39,6 +41,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.StatFs;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
@@ -53,6 +56,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -68,9 +72,13 @@ import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
@@ -80,13 +88,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.LongFunction;
 import java.util.regex.Pattern;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class MainActivity extends Activity implements PermissionUtil.PermissionsCallBack{
     private final static String[] SUPPORTED_ARCHITECTURES = {"arm64-v8a", "armeabi-v7a"};
     private ScheduledExecutorService svc;
     private ImageView imageview,screenshotimage,controller_scanner,paywallet_scanner;
     private TextView tvLog,cpu,back;
     private EditText edPool,edUser,edThreads, edMaxCpu;
-    private TextView tvSpeed,tvAccepted,controller,contribution_percent,threads_percent,device_name,device_name1,paywallet1,controllerscan;
+    private TextView tvSpeed,tvAccepted,controller,contribution_percent,threads_percent,device_name,device_name1,paywallet1,controllerscan,estimate,profit,hashmap,processorname;
     private CheckBox cbUseWorkerId;
     private Switch no_sleep,plugged_only;
     private Button screenshot,done;
@@ -105,8 +119,12 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     private int threadspercent;
     private int threads;
     private Button openurl;
+    private IntentFilter intentfilter;
     double i=Double.parseDouble(String.valueOf(11.11));
-    int j;
+    float batteryTemp;
+    String currentBatterytemp="Current Battery temp :";
+    int batteryLevel;
+    ProgressBar progressbar;
     @SuppressLint("ResourceAsColor")
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -121,7 +139,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         edUser = findViewById(R.id.username);
         edThreads = findViewById(R.id.threads);
         edMaxCpu = findViewById(R.id.maxcpu);
-        cpu = findViewById(R.id.cpu);
+
        //imageview = findViewById(R.id.imageView);
         cbUseWorkerId = findViewById(R.id.use_worker_id);
         screenshotimage=findViewById(R.id.screenshotImage);
@@ -131,9 +149,21 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         openurl = findViewById(R.id.openurl);
         ImageView shareButton = (ImageView) findViewById(R.id.share);
         device_name1 = (TextView) findViewById(R.id.device_name1);
-        enableButtons(true);
+        graphView = (GraphView) findViewById(R.id.graph);
+        progressbar=(ProgressBar) findViewById(R.id.progressbar);
+        estimate=(TextView) findViewById(R.id.estimate);
+        profit=(TextView) findViewById(R.id.profit);
+        hashmap=(TextView) findViewById(R.id.hashmap);
+        processorname=(TextView) findViewById(R.id.processorname);
 
+        enableButtons(true);
+        postData("dero","2500","30",".01","0.06");
+        progressbar.setVisibility(View.VISIBLE);
         //cpu.setText("Snap Dragon  "+edMaxCpu.getText().toString());
+
+
+
+
 
         ///show device name
         String deviceName = android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL;
@@ -148,8 +178,8 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         });
 
         //Log.e("speed","speed"+speed);
-        ///graph line
-        graphView = findViewById(R.id.graph);
+
+
         TextView popup = findViewById(R.id.settings);
         popup.setOnClickListener(new View.OnClickListener() {
             @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
@@ -356,22 +386,66 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         startService(intent);
     }
 
-    private void callGraph(double y) {
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[]{
-                // on below line we are adding
-                // each point on our x and y axis.
-                new DataPoint(0, 0),
-                new DataPoint(0, y)
-        });
 
-        graphView.setTitle("Time Graph View");
-        graphView.setTitleColor(R.color.colorPrimary);
-        graphView.setTitleTextSize(18);
-        series.setColor(R.color.colorPrimary);
-        series.setDrawBackground(true);
-        series.setDrawDataPoints(true);
-        graphView.addSeries(series);
+    private void postData(String name, String hashrate,String power,String poolfee,String powercost) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://www.coincalculators.io/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        Api retrofitAPI = retrofit.create(Api.class);
+
+        Call<DataResponse> call = retrofitAPI.createPost(name, hashrate, power, poolfee, powercost);
+
+        call.enqueue(new Callback<DataResponse>() {
+            @Override
+            public void onResponse(Call<DataResponse> call, Response<DataResponse> response) {
+                Toast.makeText(MainActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
+                DataResponse responseFromAPI = response.body();
+                Log.e("response","response"+responseFromAPI);
+                profit.setText("($ "+(int) responseFromAPI.getProfitInMonthUSD()+")");
+
+                //for Temperature
+                Intent intent1 = MainActivity.this.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+                float  temp   = ((float) intent1.getIntExtra(BatteryManager.EXTRA_TEMPERATURE,0)) / 10;
+
+
+                //for GB
+                ActivityManager activityManager = (ActivityManager)  MainActivity.this.getSystemService(Context.ACTIVITY_SERVICE);
+                ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+                activityManager.getMemoryInfo(memoryInfo);
+                long totalMemory = memoryInfo.totalMem;
+                int gb = (int) (totalMemory / 1073741824.0);
+
+                //for processer
+                processorname.setText(Build.ID);
+
+                Log.e("pro","pro "+Build.ID);
+
+                //estimate month
+                float month=(float) responseFromAPI.getRewardsInMonth();
+                String s=String.valueOf(month);
+                String substr=s.substring(0,3);
+
+                float hash=(float) responseFromAPI.getYourHashrate();
+                String s1=String.valueOf(hash);
+                String substr1=s1.substring(0,2);
+
+
+
+                estimate.setText("Est "+substr+"/mo");
+
+                hashmap.setText(gb+"GB - "+substr1+"kh/s - "+temp +"\u2103" );
+            }
+
+            @Override
+            public void onFailure(Call<DataResponse> call, Throwable t) {
+                Toast.makeText(getApplicationContext(),"Error"+t.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
+
 
     private void scanImage() {
         IntentIntegrator intentIntegrator = new IntentIntegrator(this);
@@ -614,7 +688,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 tvAccepted.setText(Integer.toString(binder.getService().getAccepted()));
                 tvSpeed.setText(binder.getService().getSpeed());
                 speed=binder.getService().getSpeed();
-                Log.e("aa","aaa "+binder.getService().getSpeed());
+                Log.e("aa","accepted"+binder.getService().getOutput());
 
                 if(speed.matches("[0-9]+[\\.]?[0-9]*")){
                     Log.e("speed","aaa "+speed);
@@ -622,14 +696,31 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                     SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref", MODE_PRIVATE);
                     SharedPreferences.Editor myEdit = sharedPreferences.edit();
                     myEdit.putString("speed", speed);
-
                     String speed321 = sharedPreferences.getString("speed","");
                     Log.e("speed321","speed1"+speed321);
-
                 }
             }
         });
     }
+
+        private void callGraph(double y) {
+            progressbar.setVisibility(View.GONE);
+            LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[]{
+                    // on below line we are adding
+                    // each point on our x and y axis.
+                    new DataPoint(0, 0),
+                    new DataPoint(0, y)
+            });
+
+            graphView.setTitle("Time Graph View");
+            graphView.setTitleColor(R.color.colorPrimary);
+            graphView.setTitleTextSize(18);
+            series.setColor(R.color.colorPrimary);
+            series.setDrawBackground(true);
+            series.setDrawDataPoints(true);
+            graphView.addSeries(series);
+    }
+
     @Override
     public void permissionsGranted() {
         Toast.makeText(this, "Permissions Granted!", Toast.LENGTH_SHORT).show();
@@ -639,4 +730,6 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     public void permissionsDenied() {
         Toast.makeText(this, "Permissions Denied!", Toast.LENGTH_SHORT).show();
     }
+
+
 }
