@@ -155,7 +155,7 @@ public class MiningService extends Service {
                     "--hu;ge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8"+
                     "--retry-pause=2";
             String args = String.format(config_template, pool, wallet, max_bwt);
-            String binary = "./libpm.so";
+            String binary = "./lib-pocketminer.so";
             ProcessBuilder pb = new ProcessBuilder(binary, args);
 
             //in our directory, which is
