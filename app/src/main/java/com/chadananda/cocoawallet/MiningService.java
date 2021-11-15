@@ -34,6 +34,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.UUID;
 
+import java.io.File;
+
+
 /**
  * MiningService for mining in the background
  * Created by uwe on 24.01.18.
@@ -60,8 +63,14 @@ public class MiningService extends Service {
 
         //path where we may execute our program
         //privatePath = getFilesDir().getAbsolutePath();
+//        System.loadLibrary("libpm");
         privatePath = this.getApplicationInfo().nativeLibraryDir;
         Log.e("privatePath","privatePath: "+privatePath);
+        File[] fileList = new File(privatePath).listFiles((dir, name) -> {
+            Log.e("privatePath","file: "+name);
+            return true; // we simply want all the files in this directory
+        });
+
 
         workerId = fetchOrCreateWorkerId();
         Log.w(LOG_TAG, "my workerId: " + workerId);
@@ -143,6 +152,7 @@ public class MiningService extends Service {
             Log.i(LOG_TAG, "shutting down old process first...");
             process.destroy();
         }
+        String fullPath = "";
         try {
             // write the config
             // Tools.writeConfig(configTemplate, config.pool, config.username, config.threads, config.maxCpu, privatePath);
@@ -152,14 +162,15 @@ public class MiningService extends Service {
             String pool = "us.hero.miner.us:1117";
             String config_template = "-o %s -u %s --tls -k --coin dero -a astrobwt "+
                     "--astrobwt-max-size=%s --astrobwt-avx2 --pause-on-battery --huge-pages=TRUE "+
-                    "--hu;ge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8"+
+                    "--huge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8"+
                     "--retry-pause=2";
             String args = String.format(config_template, pool, wallet, max_bwt);
-            String binary = "./lib-pocketminer.so";
-            ProcessBuilder pb = new ProcessBuilder(binary, args);
+            String binary = "libpm.so";
+            fullPath = privatePath+"/"+binary;
+            ProcessBuilder pb = new ProcessBuilder(binary);
 
             //in our directory, which is
-            java.io.File dir = new java.io.File(privatePath);
+            java.io.File dir = new java.io.File(privatePath+"/");
             pb.directory(dir); // needs to be a file type
 
             // with the directory as ld path so xmrig finds the libs
@@ -175,8 +186,13 @@ public class MiningService extends Service {
             Toast.makeText(this, "started: ", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Log.e("launcherror","error: "+e.getLocalizedMessage()+e.getCause());
-
-            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+            File ourApp = new File(fullPath);
+            if (ourApp.exists()) {
+                Log.e("launcherror","but file does exist: "+fullPath);
+            } else {
+                Log.e("launcherror","file not found: "+fullPath);
+            }
             process = null;
         }
     }
