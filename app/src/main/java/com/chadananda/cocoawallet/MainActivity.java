@@ -225,6 +225,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 ///check no sleep
                 if (onoff.equals("ON")){
                     no_sleep.setChecked(true);
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 }else {
                     no_sleep.setChecked(false);
                 }
@@ -409,7 +410,6 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 Intent intent1 = MainActivity.this.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
                 float  temp   = ((float) intent1.getIntExtra(BatteryManager.EXTRA_TEMPERATURE,0)) / 10;
 
-
                 //for GB
                 ActivityManager activityManager = (ActivityManager)  MainActivity.this.getSystemService(Context.ACTIVITY_SERVICE);
                 ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
@@ -430,7 +430,6 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 float hash=(float) responseFromAPI.getYourHashrate();
                 String s1=String.valueOf(hash);
                 String substr1=s1.substring(0,2);
-
 
 
                 estimate.setText("Est "+substr+"/mo");
@@ -488,46 +487,46 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
         }
     }
 
-    private void startMining(View view) {
-        Log.e("start","start"+threadspercent);
-        requestPermission();
-        if (edUser.getText().toString().isEmpty()){
-            Toast.makeText(this,"Enter UserName",Toast.LENGTH_SHORT).show();
-        }
-        else if (edPool.getText().toString().isEmpty())
-        {
-            Toast.makeText(this,"Enter Pool Address",Toast.LENGTH_SHORT).show();
-        }
-
-        else if (edMaxCpu.getText().toString().isEmpty())
-        {
-            Toast.makeText(this,"Enter MaxCpu",Toast.LENGTH_SHORT).show();
-        }
-        else if (cbUseWorkerId.getText().toString().isEmpty())
-        {
-            Toast.makeText(this,"Enter Percent",Toast.LENGTH_SHORT).show();
-        }
-        else {
-            Log.e("start","start: "+binder);
-            if (binder == null) return;
-            MiningService.MiningConfig cfg = binder.getService().newConfig(
-                    edUser.getText().toString(),
-                   //" 8AaNnN8nQUMh3XQfyt4kEt8TR7RYnowhjVynzShWwVLiR6dWdSp42YeFvouLZoui7S46xSgDxapbeS7Tdqyz7em5Chqd4HA",
-
-                    edPool.getText().toString(),
-                    //"gulf.moneroocean.stream:10001",
-                    Integer.parseInt(
-                            String.valueOf(threadspercent)
-                            //"3"
-                    ), Integer.parseInt(
-                            edMaxCpu.getText().toString()
-                            //"80"
-                    ), cbUseWorkerId.isChecked());
-            // Log.e("start","cfg: "+cfg.toString());
-            binder.getService().startMining(cfg);
-
-        }
-    }
+//    private void startMining(View view) {
+//        Log.e("start","start"+threadspercent);
+//        requestPermission();
+//        if (edUser.getText().toString().isEmpty()){
+//            Toast.makeText(this,"Enter UserName",Toast.LENGTH_SHORT).show();
+//        }
+//        else if (edPool.getText().toString().isEmpty())
+//        {
+//            Toast.makeText(this,"Enter Pool Address",Toast.LENGTH_SHORT).show();
+//        }
+//
+//        else if (edMaxCpu.getText().toString().isEmpty())
+//        {
+//            Toast.makeText(this,"Enter MaxCpu",Toast.LENGTH_SHORT).show();
+//        }
+//        else if (cbUseWorkerId.getText().toString().isEmpty())
+//        {
+//            Toast.makeText(this,"Enter Percent",Toast.LENGTH_SHORT).show();
+//        }
+//        else {
+//            Log.e("start","start: "+binder);
+//            if (binder == null) return;
+//            MiningService.MiningConfig cfg = binder.getService().newConfig(
+//                    edUser.getText().toString(),
+//                   //" 8AaNnN8nQUMh3XQfyt4kEt8TR7RYnowhjVynzShWwVLiR6dWdSp42YeFvouLZoui7S46xSgDxapbeS7Tdqyz7em5Chqd4HA",
+//
+//                    edPool.getText().toString(),
+//                    //"gulf.moneroocean.stream:10001",
+//                    Integer.parseInt(
+//                            String.valueOf(threadspercent)
+//                            //"3"
+//                    ), Integer.parseInt(
+//                            edMaxCpu.getText().toString()
+//                            //"80"
+//                    ), cbUseWorkerId.isChecked());
+//            // Log.e("start","cfg: "+cfg.toString());
+//            binder.getService().startMining(cfg);
+//
+//        }
+//    }
 
 
     public void TakeScreenShot() {
@@ -641,7 +640,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 if (binder == null) return;
                 MiningService.MiningConfig cfg = binder.getService().newConfig(
                         edUser.getText().toString(),
-                        //" 8AaNnN8nQUMh3XQfyt4kEt8TR7RYnowhjVynzShWwVLiR6dWdSp42YeFvouLZoui7S46xSgDxapbeS7Tdqyz7em5Chqd4HA",
+                        //"8AaNnN8nQUMh3XQfyt4kEt8TR7RYnowhjVynzShWwVLiR6dWdSp42YeFvouLZoui7S46xSgDxapbeS7Tdqyz7em5Chqd4HA",
                         edPool.getText().toString(),
                         //"gulf.moneroocean.stream:10001",
                         Integer.parseInt(
@@ -697,7 +696,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                     SharedPreferences.Editor myEdit = sharedPreferences.edit();
                     myEdit.putString("speed", speed);
                     String speed321 = sharedPreferences.getString("speed","");
-                    Log.e("speed321","speed1"+speed321);
+                    Log.e("speed1","speed1"+speed321);
                 }
             }
         });

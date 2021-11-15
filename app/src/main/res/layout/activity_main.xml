@@ -482,5 +482,4 @@
         android:id="@+id/showurl"
         android:visibility="gone"/>
 
-
 </RelativeLayout>

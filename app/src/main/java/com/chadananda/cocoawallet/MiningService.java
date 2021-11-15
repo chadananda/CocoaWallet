@@ -24,6 +24,7 @@ import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.text.LoginFilter;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -32,6 +33,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Locale;
 import java.util.UUID;
 
 import java.io.File;
@@ -45,7 +47,6 @@ import java.io.File;
 public class MiningService extends Service {
     private static final String LOG_TAG = "MiningSvc";
     private Process process;
-    // private String configTemplate;
     private String privatePath;
     private String workerId;
     private OutputReaderThread outputHandler;
@@ -59,7 +60,7 @@ public class MiningService extends Service {
     public void onCreate() {
         super.onCreate();
         // load config template
-        // configTemplate = Tools.loadConfigTemplate(this);
+
 
         //path where we may execute our program
         //privatePath = getFilesDir().getAbsolutePath();
@@ -71,12 +72,11 @@ public class MiningService extends Service {
             return true; // we simply want all the files in this directory
         });
 
-
         workerId = fetchOrCreateWorkerId();
         Log.w(LOG_TAG, "my workerId: " + workerId);
 
         String abi = Build.CPU_ABI.toLowerCase();
-        Log.e("abi","abi: "+abi);
+
 
 
         //copy binaries to a path where we may execute it);
@@ -155,9 +155,10 @@ public class MiningService extends Service {
         String fullPath = "";
         try {
             // write the config
-            // Tools.writeConfig(configTemplate, config.pool, config.username, config.threads, config.maxCpu, privatePath);
+
             // we'll get these from the config object after it's working
             String appDir = this.getApplicationInfo().nativeLibraryDir;
+
             String wallet = "dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRvNz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
             String max_bwt = "710";
             String pool = "us.hero.miner.us:1117";
@@ -165,21 +166,28 @@ public class MiningService extends Service {
                     "--astrobwt-max-size=%s --astrobwt-avx2 --pause-on-battery --huge-pages=TRUE "+
                     "--huge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8"+
                     "--retry-pause=2";
+
             String args = String.format(config_template, pool, wallet, max_bwt);
-            String[] pm = { "./libpm.so", args };
+
+            String[] pm = {"./libpm.so", args};
+
             fullPath = privatePath+"/libpm.so";
+
+            Log.e("args","args"+appDir);
+
             ProcessBuilder pb = new ProcessBuilder( pm );
 
             //in our directory, which is
             pb.directory(new File(appDir)); // needs to be a file type
-
             // with the directory as ld path so xmrig finds the libs
             pb.environment().put("LD_LIBRARY_PATH", appDir);
             //in case of errors, read them
             pb.redirectErrorStream();
             accepted = 0;
             //run it!
-            Process process = pb.start();   // how do we check if this worked?
+            Process process = pb.start();
+
+            // how do we check if this worked?
             //start processing miners output    // so why not use pb.redirectOutput(); ?
             outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
             outputHandler.start();
@@ -195,7 +203,7 @@ public class MiningService extends Service {
             }
             process = null;
         }
-    }
+}
 
     public String getSpeed() {
         return speed;
