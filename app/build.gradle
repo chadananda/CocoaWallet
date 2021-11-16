@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
-    ndkVersion '21.1.6352462'
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -14,6 +13,7 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
+        ndk.abiFilters 'armeabi-v7a','arm64-v8a','x86','x86_64'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         externalNativeBuild {
@@ -22,8 +22,10 @@ android {
                 arguments "-DANDROID_ARM_NEON=TRUE",'-DANDROID_STL=c++_shared'
             }
         }
+        ndk {
+            abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
+        }
     }
-
 
     buildTypes {
         releaseDebugKey { initWith release }
@@ -50,6 +52,7 @@ android {
 }
 
 dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
     implementation 'androidx.annotation:annotation:1.2.0'
     implementation 'androidx.core:core:1.6.0'
     implementation 'com.android.support:cardview-v7:28.0.0'

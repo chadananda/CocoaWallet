@@ -321,9 +321,8 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                         wallet = sharedPreferences.getString("wallet123","");
                         threads = sharedPreferences.getInt("threads",0);
                         control= sharedPreferences.getString("controller123","");
-
+                        myEdit.putString("onff", no_sleep1);
                         if (wallet.equals("")||control.equals("")) {
-                            myEdit.putString("onff", no_sleep1);
                             myEdit.putString("wallet123", wallet123);
                             myEdit.putString("controller123", controller123);
                             myEdit.putInt("threads",threadspercent);
@@ -339,9 +338,11 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                             no_sleep1 = no_sleep.getTextOn().toString();
                             Toast.makeText(getApplication(),"On",Toast.LENGTH_SHORT).show();
                             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                        } else {
+                        } else if (no_sleep.isChecked()){
                             Toast.makeText(getApplication(),"Sleep Mode Off",Toast.LENGTH_SHORT).show();
                             no_sleep1 = no_sleep.getTextOff().toString();
+                        }else {
+
                         }
                     }
                 });
