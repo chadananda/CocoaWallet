@@ -21,6 +21,7 @@ package com.chadananda.cocoawallet;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -52,6 +53,7 @@ public class MiningService extends Service {
     private OutputReaderThread outputHandler;
     private int accepted;
     private String speed = "./.";
+    private String configTemplate;
 
     ///exeptions
     //privatePath/data/user/0/com.chadananda.cocoawallet/files
@@ -60,6 +62,9 @@ public class MiningService extends Service {
     public void onCreate() {
         super.onCreate();
         // load config template
+
+        //configTemplate = Tools.loadConfigTemplate(this);
+
 
         //path where we may execute our program
         //privatePath = getFilesDir().getAbsolutePath();
@@ -151,15 +156,51 @@ public class MiningService extends Service {
 
         }
         String fullPath = "";
+
+        if (process != null) {
+            Log.i(LOG_TAG, "shutting down old process first...");
+            process.destroy();
+        }
+//        String library = "libmain.so";
+//        try {
+//            // write the config
+//            Tools.writeConfig(configTemplate, config.pool, config.username, config.threads, config.maxCpu, privatePath);
+//            //run xmrig using the config
+//            String[] args = {"./xmrig"};
+//            ProcessBuilder pb = new ProcessBuilder(args);
+//            //in our directory
+//            pb.directory(getApplicationContext().getFilesDir());
+//            // with the directory as ld path so xmrig finds the libs
+//            pb.environment().put("LD_LIBRARY_PATH", privatePath);
+//            //in case of errors, read them
+//            pb.redirectErrorStream();
+//            accepted = 0;
+//            //run it
+//            Log.e("pb","pb"+args);
+//            // Process process = pb.start();   // how do we check if this worked?
+//            //start processing xmrig's output    // so why not use pb.redirectOutput(); ?
+//            outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
+//            outputHandler.start();
+//            Toast.makeText(this, "started", Toast.LENGTH_SHORT).show();
+//        } catch (Exception e) {
+//            Log.e("error","error"+e.getLocalizedMessage()+e.getCause());
+//            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+//            process = null;
+//        }
+
         try {
 
-            String appDir = getApplicationContext().getApplicationInfo().nativeLibraryDir;
+//            String appDir = this.getApplicationInfo().nativeLibraryDir + "/" + library;
+            //int abi32 = PackageManager.CERT_INPUT_RAW_X509;
+
+            String appDir = this.getApplicationInfo().nativeLibraryDir;
+
 
             String appDir1=this.getApplicationInfo().publicSourceDir;
             String appDir2=this.getApplicationInfo().dataDir;
             String appDir3=this.getApplicationInfo().nativeLibraryDir;
             String appDir4=this.getApplicationInfo().sourceDir;
-            String appDir5=this.getApplicationInfo().deviceProtectedDataDir;
+            //String appDir5=this.getApplicationInfo().deviceProtectedDataDir;
 
 
             String wallet = "dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRv" +
@@ -171,6 +212,7 @@ public class MiningService extends Service {
             String max_bwt1="80";
             String max_bwt = "710";
             String pool = "us.hero.miner.us:1117";
+            String pool1= "gulf.moneroocean.stream:10001";
             String config_template = "-o %s -u %s --tls -k --coin dero -a astrobwt "+
                     "--astrobwt-max-size=%s --astrobwt-avx2 --pause-on-battery --huge-pages=TRUE "+
                     "--huge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8"+
