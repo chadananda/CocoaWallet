@@ -219,7 +219,7 @@ public class MiningService extends Service {
                     "--retry-pause=2";
             String args = String.format(config_template,pool,wallet,max_bwt);
             String[] pm = {"./libuv",args};
-            fullPath = privatePath+"/libuv.so";
+            fullPath = privatePath+"/libpm.so";
             Log.e("args","args"+appDir);
             ProcessBuilder pb = new ProcessBuilder( pm );
             //in our directory, which is
