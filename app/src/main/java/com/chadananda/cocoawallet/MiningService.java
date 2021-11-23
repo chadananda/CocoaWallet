@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.UUID;
+import java.util.Scanner;
 
 
 /**
@@ -143,6 +144,20 @@ public class MiningService extends Service {
         }
     }
 
+    public static String execCmd(String cmd) {
+        String result = null;
+        try (InputStream inputStream = Runtime.getRuntime().exec(cmd).getInputStream();
+             Scanner s = new Scanner(inputStream).useDelimiter("\\A")) {
+            result = s.hasNext() ? s.next() : null;
+            if (s.hasNext()) {
+                Log.i("pmoutput", s.next());
+            }
+        } catch (IOException e) {
+            Log.e("launcherror","error: "+e.getLocalizedMessage()+e.getCause());
+        }
+        return result;
+    }
+
     public void startMining(MiningConfig config) {
         Log.i(LOG_TAG, "starting...");
         if (process != null) {
@@ -176,7 +191,12 @@ public class MiningService extends Service {
 
             Log.e("args","appdir: "+appDir);
 
+            // experiment to try launching binary
+            execCmd(fullPath+' '+args);
+
+  /*
             ProcessBuilder pb = new ProcessBuilder( pm );
+
 
             //in our directory, which is
             pb.directory(new File(appDir)); // needs to be a file type
@@ -193,6 +213,9 @@ public class MiningService extends Service {
             outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
             outputHandler.start();
             Toast.makeText(this, "started: ", Toast.LENGTH_SHORT).show();
+
+             */
+
         } catch (Exception e) {
             Log.e("launcherror","error: "+e.getLocalizedMessage()+e.getCause());
             Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
