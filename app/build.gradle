@@ -46,7 +46,10 @@ android {
     androidResources {
         noCompress 'pdf'
     }
-
+    sourceSets.main {
+        jniLibs.srcDirs = ['libs']
+        jni.srcDirs = []
+    }
 }
 
 dependencies {
