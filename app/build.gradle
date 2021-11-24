@@ -42,20 +42,28 @@ android {
 
     }
     packagingOptions {
-        pickFirst 'lib/x86/libc++_shared.so'
-        pickFirst 'lib/x86_64/libc++_shared.so'
-        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
-        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+        pickFirst 'lib/x86/libpm.so'
+        pickFirst 'lib/x86_64/libpm.so'
+        pickFirst 'lib/armeabi-v7a/libpm.so'
+        pickFirst 'lib/arm64-v8a/libpm.so'
     }
     androidResources {
         noCompress 'pdf'
     }
 
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ["libs"]
+        }
+    }
+    ndkVersion '21.4.7075529'
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
+    implementation fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
+    //noinspection GradleDependency
     implementation 'androidx.annotation:annotation:1.2.0'
+    //noinspection GradleDependency
     implementation 'androidx.core:core:1.6.0'
     implementation 'com.journeyapps:zxing-android-embedded:4.2.0'
     implementation 'com.jjoe64:graphview:4.2.2'

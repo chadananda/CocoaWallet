@@ -474,7 +474,6 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
             if (!mydir.exists()) {
                 mydir.mkdirs();
             }
-
             View view = getWindow().getDecorView().getRootView();
             view.setDrawingCacheEnabled(true);
             Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache());
@@ -526,7 +525,6 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
             }
         },3000);
     }
-
     private void stopMining(View view) {
         binder.getService().stopMining();
     }
@@ -553,6 +551,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
             if (validArchitecture) {
                 enableButtons(true);
                 Log.e("binder","binder"+binder);
+
                 //findViewById(R.id.start).setOnClickListener(MainActivity.this::startMining);
 
                 ///start Button
@@ -603,7 +602,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 tvAccepted.setText(Integer.toString(binder.getService().getAccepted()));
                 tvSpeed.setText(binder.getService().getSpeed());
                 speed=binder.getService().getSpeed();
-                Log.e("aa","accepted"+binder.getService().getOutput());
+                Log.e("aa","accepted"+speed);
 
                 if(speed.matches("[0-9]+[\\.]?[0-9]*")){
                     Log.e("speed","aaa "+speed);

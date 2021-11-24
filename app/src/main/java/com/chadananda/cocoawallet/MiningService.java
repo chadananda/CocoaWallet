@@ -53,23 +53,23 @@ public class MiningService extends Service {
     private int accepted;
     private String speed = "./.";
     private String configTemplate;
-
+   /* static {
+        System.loadLibrary("pm");
+    }*/
     //exeptions
     //privatePath/data/user/0/com.chadananda.cocoawallet/files
-
+    public native String stringFromJNI();
     @Override
     public void onCreate() {
         super.onCreate();
         // load config template
-
         //configTemplate = Tools.loadConfigTemplate(this);
-
         //path where we may execute our program
-       String path = getFilesDir().getAbsolutePath();
-        Log.e("path","path: "+path);
+
+      //  Log.e("path","path: "+path);
         //System.loadLibrary("pm");
-        privatePath = this.getApplicationInfo().nativeLibraryDir;
-        Log.e("privatePath","privatePath: "+privatePath);
+       // privatePath = this.getApplicationInfo().nativeLibraryDir;
+
       //  File[] fileList = new File(privatePath).listFiles((dir, name) -> {
       //      Log.e("privatePath","file: "+name);
       //      return true; // we simply want all the files in this directory
@@ -79,7 +79,7 @@ public class MiningService extends Service {
         Log.w(LOG_TAG, "my workerId: " + workerId);
 
         String abi = Build.CPU_ABI.toLowerCase();
-
+       // Tools.copyFile(this,"arm64-v8a" + "/libpm", privatePath + "/libpm.so");
         //copy binaries to a path where we may execute it);
 //        Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrigCC");
 //       Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrig");
@@ -151,13 +151,17 @@ public class MiningService extends Service {
 
     public void startMining(MiningConfig config) {
         Log.i(LOG_TAG, "starting...");
-        if (process != null) {
+       /* if (process != null) {
             Log.i(LOG_TAG, "shutting down old process first...");
             process.destroy();
 
-        }
-        String fullPath = "";
-        try {
+        }*/
+        privatePath = getFilesDir().getAbsolutePath();
+
+       // Log.d("TAG", "startMining: "+stringFromJNI());
+        Log.e("privatePath","privatePath: "+privatePath);
+       // String fullPath = "";
+        try{
             String appDir=this.getApplicationInfo().nativeLibraryDir;
             String wallet="dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRvNz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
             String max_bwt="710";
@@ -167,36 +171,31 @@ public class MiningService extends Service {
                     "--huge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8"+
                     "--retry-pause=2";
             String args = String.format(config_template,pool,wallet,max_bwt);
-            String[] pm = {"./libuv",args};
-            fullPath = privatePath+"/libuv";
-            Log.e("args","args"+appDir+" "+fullPath);
-            ProcessBuilder pb = new ProcessBuilder( pm );
-            //in our directory, which is
+            String[] pm = {"./libpm",args};
+            Runtime.getRuntime().exec(new String[]{"bash", "-l", "-c", args}, null, new File(appDir));
+           // fullPath = privatePath+"/libpm.so";
+            Log.e("args","args"+" "+appDir);
+            ProcessBuilder pb = new ProcessBuilder("./libpm",args);
             pb.directory(new File(appDir));
-            //needs to be a file type
-            //with the directory as ld path so xmrig finds the libs
             pb.environment().put("LD_LIBRARY_PATH", appDir);
-            //in case of errors, read them
             pb.redirectErrorStream();
             accepted = 0;
-            //run it!
-            Process process = pb.start();
-            // how do we check if this worked?
-            //start processing miners output
-            // so why not use pb.redirectOutput(); ?0
+            Process  process = pb.start();
             outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
             outputHandler.start();
-            Toast.makeText(this, "started: ", Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
+            Toast.makeText(this, "started if:", Toast.LENGTH_SHORT).show();
+        }
+
+        catch (Exception e) {
             Log.e("launcherror","error: "+e.getLocalizedMessage()+e.getCause());
-            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-            File ourApp = new File(fullPath);
-            if (ourApp.exists()) {
+          //  Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+          //  File ourApp = new File(fullPath);
+           /* if (ourApp.exists()) {
                 Log.e("launcherror","but file does exist: "+fullPath);
             } else {
                 Log.e("launcherror","file not found: "+fullPath);
-            }
-            process = null;
+            }*/
+           // process = null;
         }
     }
 
