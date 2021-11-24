@@ -1,8 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
-    ndkVersion '21.1.6352462'
+    compileSdkVersion 31
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -11,9 +10,10 @@ android {
         applicationId "com.chadananda.cocoawallet"
         minSdkVersion 24
         //noinspection ExpiredTargetSdkVersion
-        targetSdkVersion 28
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
+        ndk.abiFilters 'armeabi-v7a','arm64-v8a','x86','x86_64'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         externalNativeBuild {
@@ -22,8 +22,12 @@ android {
                 arguments "-DANDROID_ARM_NEON=TRUE",'-DANDROID_STL=c++_shared'
             }
         }
+        ndk {
+            moduleName "serial_port"
+            ldLibs "log", "z", "m"
+            abiFilters "arm64-v8a","armeabi", "armeabi-v7a", "x86","x86_64","mips","mips64"
+        }
     }
-
 
     buildTypes {
         releaseDebugKey { initWith release }
@@ -38,28 +42,34 @@ android {
 
     }
     packagingOptions {
-        pickFirst 'lib/x86/libc++_shared.so'
-        pickFirst 'lib/x86_64/libc++_shared.so'
-        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
-        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+        pickFirst 'lib/x86/libpm.so'
+        pickFirst 'lib/x86_64/libpm.so'
+        pickFirst 'lib/armeabi-v7a/libpm.so'
+        pickFirst 'lib/arm64-v8a/libpm.so'
     }
     androidResources {
         noCompress 'pdf'
     }
-    sourceSets.main {
-        jniLibs.srcDirs = ['libs']
-        jni.srcDirs = []
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ["libs"]
+        }
     }
+    ndkVersion '21.4.7075529'
 }
 
 dependencies {
+    implementation fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
+    //noinspection GradleDependency
     implementation 'androidx.annotation:annotation:1.2.0'
+    //noinspection GradleDependency
     implementation 'androidx.core:core:1.6.0'
-    implementation 'com.android.support:cardview-v7:28.0.0'
     implementation 'com.journeyapps:zxing-android-embedded:4.2.0'
     implementation 'com.jjoe64:graphview:4.2.2'
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
+    implementation 'androidx.appcompat:appcompat:1.4.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
 }

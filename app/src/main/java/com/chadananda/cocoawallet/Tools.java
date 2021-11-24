@@ -130,6 +130,12 @@ public class Tools {
                         value = value.replaceAll ("\\s+", " ");
                     output.put (key, value);
                 }
+//                if (key.equals ("model_name")) key = "cpu_model";
+//                String value = data[1].trim ();
+//                if (key.equals ("cpu_model"))
+//                    value = value.replaceAll ("\\s+", " ");
+//                output.put (key, value);
+//            }
             }
             br.close ();
         }
