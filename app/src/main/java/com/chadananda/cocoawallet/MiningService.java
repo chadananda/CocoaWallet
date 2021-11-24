@@ -190,12 +190,23 @@ public class MiningService extends Service {
                 "--huge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8"+
                 "--retry-pause=2";
         String args = String.format(config_template,pool,wallet,max_bwt);
-        String[] pm = {"./libpm",args};
-        Runtime.getRuntime().exec(new String[]{"bash", "-l", "-c", args}, null, new File(appDir));
-       // fullPath = privatePath+"/libpm.so";
+        String[] pm = {"./libpm", args};
+        fullPath = appDir+"/libpm.so";
         Log.e("args","args"+" "+appDir);
-        ProcessBuilder pb = new ProcessBuilder("./libpm",args);
+        //Runtime.getRuntime().exec(new String[]{"bash", "-l", "-c", args}, null, new File(appDir));
+
+        ProcessBuilder pb = new ProcessBuilder("./libpm", args);
         pb.directory(new File(appDir));
+
+          // with the directory as ld path so xmrig finds the libs
+          pb.environment().put("LD_LIBRARY_PATH", appDir);
+          pb.redirectErrorStream();
+          accepted = 0;
+          Process  process = pb.start();
+          outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
+          outputHandler.start();
+          Toast.makeText(this, "started: ", Toast.LENGTH_SHORT).show();
+
           
 //             String args = String.format(config_template, pool, wallet, max_bwt);
 //             String[] pm = {"./libpm.so", args};
@@ -220,14 +231,14 @@ public class MiningService extends Service {
 
       } catch (Exception e) {
         Log.e("launcherror","error: "+e.getLocalizedMessage()+e.getCause());
-          //  Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-          //  File ourApp = new File(fullPath);
-           /* if (ourApp.exists()) {
-                Log.e("launcherror","but file does exist: "+fullPath);
-            } else {
-                Log.e("launcherror","file not found: "+fullPath);
-            }*/
-           // process = null;
+        //  Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+        File ourApp = new File(fullPath);
+        if (ourApp.exists()) {
+          Log.e("launcherror","but file does exist: "+fullPath);
+        } else {
+          Log.e("launcherror","file not found: "+fullPath);
+        }
+        // process = null;
         String outDirString = appDir; //"/data/data/com.chadananda.cocoawallet/lib";
         File ourDir = new File(outDirString);
         if (ourDir.exists()) {
