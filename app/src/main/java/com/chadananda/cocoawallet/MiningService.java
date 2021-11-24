@@ -162,95 +162,56 @@ public class MiningService extends Service {
 
     public void startMining(MiningConfig config) {
       Log.i(LOG_TAG, "starting...");
-       /* if (process != null) {
-            Log.i(LOG_TAG, "shutting down old process first...");
-            process.destroy();
-        }*/
-       // privatePath = getFilesDir().getAbsolutePath();
-       // }
-      String fullPath = "";
-      String appDir = "";
-       // try {
-            // write the config
-
-            // we'll get these from the config object after it's working
-          //  appDir = this.getApplicationInfo().nativeLibraryDir;
-            //appDir = "/data/data/com.chadananda.cocoawallet/lib/arm64-v8a";
-
-       // Log.d("TAG", "startMining: "+stringFromJNI());
-       // Log.e("privatePath","privatePath: "+privatePath);
-       // String fullPath = "";
+      if (process != null) {
+        Log.i(LOG_TAG, "shutting down old process first...");
+        process.destroy();
+      }
+      String appDir = this.getApplicationInfo().nativeLibraryDir;
+      File appDirectory = new File(appDir);
+      String fullPath = appDir+"/libpm.so";
       try {
-        appDir=this.getApplicationInfo().nativeLibraryDir;
         String wallet="dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRvNz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
         String max_bwt="710";
-        String pool = "us.hero.miner.us:1117";
-        String config_template = "-o %s -u %s --tls -k --coin dero -a astrobwt "+
-                "--astrobwt-max-size=%s --astrobwt-avx2 --pause-on-battery --huge-pages=TRUE "+
-                "--huge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8"+
-                "--retry-pause=2";
+        String pool="us.hero.miner.us:1117";
+        String config_template="-o %s -u %s --tls -k --coin dero -a astrobwt "+
+          "--astrobwt-max-size=%s --astrobwt-avx2 --pause-on-battery --huge-pages=TRUE "+
+          "--huge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8"+
+          "--retry-pause=2";
         String args = String.format(config_template,pool,wallet,max_bwt);
-        String[] pm = {"./libpm", args};
-        fullPath = appDir+"/libpm.so";
-        Log.e("args","args"+" "+appDir);
-        //Runtime.getRuntime().exec(new String[]{"bash", "-l", "-c", args}, null, new File(appDir));
+        // this is an example of what SHOULD work:
+        // Runtime.getRuntime().exec(new String[] { fullPath });
 
-        ProcessBuilder pb = new ProcessBuilder("./libpm", args);
-        pb.directory(new File(appDir));
+        ProcessBuilder pb = new ProcessBuilder();
+        pb.directory(appDirectory);
+        pb.command("libpm.so");
+        
+//        pb.environment().put("LD_LIBRARY_PATH", appDir);
+//        pb.redirectErrorStream();
+//        accepted = 0;
 
-          // with the directory as ld path so xmrig finds the libs
-          pb.environment().put("LD_LIBRARY_PATH", appDir);
-          pb.redirectErrorStream();
-          accepted = 0;
-          Process  process = pb.start();
-          outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
-          outputHandler.start();
-          Toast.makeText(this, "started: ", Toast.LENGTH_SHORT).show();
+        // this crashes with wrong error message. It says file does not exists, although it does
+        Process process = pb.start();
 
-          
-//             String args = String.format(config_template, pool, wallet, max_bwt);
-//             String[] pm = {"./libpm.so", args};
-//             fullPath = appDir+"/libpm.so";
-//             Log.e("args","appdir: "+appDir);
-//             // experiment to try launching binary
-//             execCmd(fullPath+' '+args);
-
-             /*
-            ProcessBuilder pb = new ProcessBuilder( pm );
-            //in our directory, which is
-            pb.directory(new File(appDir)); // needs to be a file type
-            // with the directory as ld path so xmrig finds the libs
-            pb.environment().put("LD_LIBRARY_PATH", appDir);
-            pb.redirectErrorStream();
-            accepted = 0;
-            Process  process = pb.start();
-            outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
-            outputHandler.start();
-            Toast.makeText(this, "started: ", Toast.LENGTH_SHORT).show();
-             */
+//        outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
+//        outputHandler.start();
+//        Toast.makeText(this, "started: ", Toast.LENGTH_SHORT).show();
 
       } catch (Exception e) {
         Log.e("launcherror","error: "+e.getLocalizedMessage()+e.getCause());
-        //  Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-        File ourApp = new File(fullPath);
-        if (ourApp.exists()) {
-          Log.e("launcherror","but file does exist: "+fullPath);
+        File app = new File(fullPath);
+        if (app.exists()) {
+          Log.e("launcherror"," but file does exist: "+fullPath);
+          if (!app.canExecute()) Log.e("launcherror"," HOWEVER, file is NOT executable!!");
+            else Log.e("launcherror","  and file IS executable. ");
         } else {
           Log.e("launcherror","file not found: "+fullPath);
         }
-        // process = null;
-        String outDirString = appDir; //"/data/data/com.chadananda.cocoawallet/lib";
-        File ourDir = new File(outDirString);
-        if (ourDir.exists()) {
-            Log.e("launcherror", "but dir exists: " + outDirString);
-            File[] ourFiles = ourDir.listFiles();
-            String myFiles = "";
-            for (int i = 0; i < ourFiles.length; i++) {
-                myFiles = myFiles +", "+ ourFiles[i].getName();
-            }
-            Log.e("launcherror", "files: " + myFiles);
+        if (appDirectory.exists()) {
+          Log.e("launcherror", " and dir exists: " + appDir);
+          if (appDirectory.canWrite()) Log.e("launcherror", "  but directory is writable: " );
+            else Log.e("launcherror", "  and directory is not writable: " );
         } else {
-            Log.e("launcherror", "dir not found: "+ outDirString);
+            Log.e("launcherror", "dir not found: "+ appDir);
         }
       }
       process = null;
