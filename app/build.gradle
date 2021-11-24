@@ -50,11 +50,11 @@ android {
     androidResources {
         noCompress 'pdf'
     }
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ["libs"]
-        }
-    }
+//    sourceSets {
+//        main {
+//            jniLibs.srcDirs = ["libs"]
+//        }
+//    }
     ndkVersion '21.4.7075529'
 }
 
