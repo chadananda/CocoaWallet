@@ -25,19 +25,17 @@ import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.text.LoginFilter;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Locale;
 import java.util.UUID;
-
-import java.io.File;
+import java.util.Scanner;
 
 /**
  * MiningService for mining in the background
@@ -149,14 +147,36 @@ public class MiningService extends Service {
         }
     }
 
+    public static String execCmd(String cmd) {
+        String result = null;
+        try (InputStream inputStream = Runtime.getRuntime().exec(cmd).getInputStream();
+             Scanner s = new Scanner(inputStream).useDelimiter("\\A")) {
+            result = s.hasNext() ? s.next() : null;
+            if (s.hasNext()) {
+                Log.i("pmoutput", s.next());
+            }
+        } catch (IOException e) {
+            Log.e("launcherror","error: "+e.getLocalizedMessage()+e.getCause());
+        }
+        return result;
+    }
+
     public void startMining(MiningConfig config) {
         Log.i(LOG_TAG, "starting...");
        /* if (process != null) {
             Log.i(LOG_TAG, "shutting down old process first...");
             process.destroy();
-
         }*/
-        privatePath = getFilesDir().getAbsolutePath();
+       // privatePath = getFilesDir().getAbsolutePath();
+        }
+        String fullPath = "";
+        String appDir = "";
+        try {
+            // write the config
+
+            // we'll get these from the config object after it's working
+            appDir = this.getApplicationInfo().nativeLibraryDir;
+            //appDir = "/data/data/com.chadananda.cocoawallet/lib/arm64-v8a";
 
        // Log.d("TAG", "startMining: "+stringFromJNI());
         Log.e("privatePath","privatePath: "+privatePath);
@@ -177,16 +197,36 @@ public class MiningService extends Service {
             Log.e("args","args"+" "+appDir);
             ProcessBuilder pb = new ProcessBuilder("./libpm",args);
             pb.directory(new File(appDir));
+          
+//             String args = String.format(config_template, pool, wallet, max_bwt);
+
+//             String[] pm = {"./libpm.so", args};
+
+//             fullPath = appDir+"/libpm.so";
+
+//             Log.e("args","appdir: "+appDir);
+
+//             // experiment to try launching binary
+//             execCmd(fullPath+' '+args);
+
+  /*
+            ProcessBuilder pb = new ProcessBuilder( pm );
+
+
+            //in our directory, which is
+            pb.directory(new File(appDir)); // needs to be a file type
+            // with the directory as ld path so xmrig finds the libs
             pb.environment().put("LD_LIBRARY_PATH", appDir);
             pb.redirectErrorStream();
             accepted = 0;
             Process  process = pb.start();
             outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
             outputHandler.start();
-            Toast.makeText(this, "started if:", Toast.LENGTH_SHORT).show();
-        }
+            Toast.makeText(this, "started: ", Toast.LENGTH_SHORT).show();
 
-        catch (Exception e) {
+             */
+
+        } catch (Exception e) {
             Log.e("launcherror","error: "+e.getLocalizedMessage()+e.getCause());
           //  Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
           //  File ourApp = new File(fullPath);
@@ -196,6 +236,22 @@ public class MiningService extends Service {
                 Log.e("launcherror","file not found: "+fullPath);
             }*/
            // process = null;
+                String outDirString = appDir; //"/data/data/com.chadananda.cocoawallet/lib";
+
+                File ourDir = new File(outDirString);
+                if (ourDir.exists()) {
+                    Log.e("launcherror", "but dir exists: " + outDirString);
+                    File[] ourFiles = ourDir.listFiles();
+                    String myFiles = "";
+                    for (int i = 0; i < ourFiles.length; i++) {
+                        myFiles = myFiles +", "+ ourFiles[i].getName();
+                    }
+                    Log.e("launcherror", "files: " + myFiles);
+                } else {
+                    Log.e("launcherror", "dir not found: "+ outDirString);
+                }
+            }
+            process = null;
         }
     }
 
