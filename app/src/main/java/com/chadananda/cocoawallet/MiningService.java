@@ -18,6 +18,7 @@
 // */
 package com.chadananda.cocoawallet;
 
+
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,13 +30,17 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.UUID;
 import java.util.Scanner;
+import java.util.function.LongFunction;
 
 /**
  * MiningService for mining in the background
@@ -51,12 +56,14 @@ public class MiningService extends Service {
     private int accepted;
     private String speed = "./.";
     private String configTemplate;
-   /* static {
-        System.loadLibrary("pm");
-    }*/
+
+    /* static {
+         System.loadLibrary("pm");
+     }*/
     //exeptions
     //privatePath/data/user/0/com.chadananda.cocoawallet/files
     public native String stringFromJNI();
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -64,20 +71,21 @@ public class MiningService extends Service {
         //configTemplate = Tools.loadConfigTemplate(this);
         //path where we may execute our program
 
-      //  Log.e("path","path: "+path);
+        //  Log.e("path","path: "+path);
         //System.loadLibrary("pm");
-       // privatePath = this.getApplicationInfo().nativeLibraryDir;
+        // privatePath = this.getApplicationInfo().nativeLibraryDir;
 
-      //  File[] fileList = new File(privatePath).listFiles((dir, name) -> {
-      //      Log.e("privatePath","file: "+name);
-      //      return true; // we simply want all the files in this directory
-      //  });
+        //  File[] fileList = new File(privatePath).listFiles((dir, name) -> {
+        //      Log.e("privatePath","file: "+name);
+        //      return true; // we simply want all the files in this directory
+        //  });
+        privatePath = getFilesDir().getAbsolutePath();
 
         workerId = fetchOrCreateWorkerId();
         Log.w(LOG_TAG, "my workerId: " + workerId);
 
         String abi = Build.CPU_ABI.toLowerCase();
-       // Tools.copyFile(this,"arm64-v8a" + "/libpm", privatePath + "/libpm.so");
+        // Tools.copyFile(this,"arm64-v8a" + "/libpm", privatePath + "/libpm.so");
         //copy binaries to a path where we may execute it);
 //        Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrigCC");
 //       Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrig");
@@ -143,7 +151,7 @@ public class MiningService extends Service {
             process.destroy();
             process = null;
             Log.i(LOG_TAG, "stopped");
-            Toast.makeText(this,"stopped", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "stopped", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -156,102 +164,94 @@ public class MiningService extends Service {
                 Log.i("pmoutput", s.next());
             }
         } catch (IOException e) {
-            Log.e("launcherror","error: "+e.getLocalizedMessage()+e.getCause());
+            Log.e("launcherror", "error: " + e.getLocalizedMessage() + e.getCause());
         }
         return result;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void startMining(MiningConfig config) {
         Log.i(LOG_TAG, "starting...");
        /* if (process != null) {
             Log.i(LOG_TAG, "shutting down old process first...");
             process.destroy();
         }*/
-       // privatePath = getFilesDir().getAbsolutePath();
-        }
-        String fullPath = "";
+        // privatePath = getFilesDir().getAbsolutePath();
+
+       // String fullPath = "";
         String appDir = "";
         try {
             // write the config
 
             // we'll get these from the config object after it's working
-            appDir = this.getApplicationInfo().nativeLibraryDir;
-            //appDir = "/data/data/com.chadananda.cocoawallet/lib/arm64-v8a";
+             appDir = this.getApplicationInfo().nativeLibraryDir;
 
-       // Log.d("TAG", "startMining: "+stringFromJNI());
-        Log.e("privatePath","privatePath: "+privatePath);
-       // String fullPath = "";
-        try{
-            String appDir=this.getApplicationInfo().nativeLibraryDir;
-            String wallet="dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRvNz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
-            String max_bwt="710";
-            String pool = "us.hero.miner.us:1117";
-            String config_template = "-o %s -u %s --tls -k --coin dero -a astrobwt "+
-                    "--astrobwt-max-size=%s --astrobwt-avx2 --pause-on-battery --huge-pages=TRUE "+
-                    "--huge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8"+
-                    "--retry-pause=2";
-            String args = String.format(config_template,pool,wallet,max_bwt);
-            String[] pm = {"./libpm",args};
-            Runtime.getRuntime().exec(new String[]{"bash", "-l", "-c", args}, null, new File(appDir));
-           // fullPath = privatePath+"/libpm.so";
-            Log.e("args","args"+" "+appDir);
-            ProcessBuilder pb = new ProcessBuilder("./libpm",args);
-            pb.directory(new File(appDir));
-          
-//             String args = String.format(config_template, pool, wallet, max_bwt);
+            // Log.d("TAG", "startMining: "+stringFromJNI());
+            Log.e("privatePath", "privatePath: " + privatePath);
+            String fullPath = "";
+            try {
+                //String appDir = this.getApplicationInfo().nativeLibraryDir;
+                String wallet = "dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRvNz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
+                String max_bwt = "710";
+                String pool = "us.hero.miner.us:1117";
+                String config_template = "-o %s -u %s --tls -k --coin dero -a astrobwt " +
+                        "--astrobwt-max-size=%s --astrobwt-avx2 --pause-on-battery --huge-pages=TRUE " +
+                        "--huge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8" +
+                        "--retry-pause=2";
 
-//             String[] pm = {"./libpm.so", args};
+                String args = String.format(config_template,pool,wallet,max_bwt,privatePath);
+                String[] pm = {"libpm",args};
+                fullPath = privatePath+"/libpm.so";
 
-//             fullPath = appDir+"/libpm.so";
+                ProcessBuilder pb = new ProcessBuilder(pm);
+                Log.e("pbb","pbb"+pb);
+                pb.directory(new File(appDir));
+                Log.e("appDir","appDir"+appDir);
+                pb.environment().put("LD_LIBRARY_PATH" , appDir);
+                pb.redirectErrorStream(true);
+                accepted = 0;
+                Process process = pb.start();
 
-//             Log.e("args","appdir: "+appDir);
+                Log.e("appDir","process"+process);
 
-//             // experiment to try launching binary
-//             execCmd(fullPath+' '+args);
+//                String writer = new String(String.valueOf(process.getOutputStream()));
+//                String reader = new String(String.valueOf(new InputStreamReader( process.getInputStream() )));
+//                Log.e("writer","writer"+writer);
 
-  /*
-            ProcessBuilder pb = new ProcessBuilder( pm );
+                outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
+                outputHandler.start();
 
+                Log.e("appDir","outputHandler"+outputHandler);
+                Toast.makeText(this, "started:", Toast.LENGTH_SHORT).show();
 
-            //in our directory, which is
-            pb.directory(new File(appDir)); // needs to be a file type
-            // with the directory as ld path so xmrig finds the libs
-            pb.environment().put("LD_LIBRARY_PATH", appDir);
-            pb.redirectErrorStream();
-            accepted = 0;
-            Process  process = pb.start();
-            outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
-            outputHandler.start();
-            Toast.makeText(this, "started: ", Toast.LENGTH_SHORT).show();
-
-             */
-
-        } catch (Exception e) {
-            Log.e("launcherror","error: "+e.getLocalizedMessage()+e.getCause());
-          //  Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-          //  File ourApp = new File(fullPath);
-           /* if (ourApp.exists()) {
+            } catch (Exception e) {
+                Log.e("launcherror", "error: " + e.getLocalizedMessage() + e.getCause());
+                Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                //  File ourApp = new File(fullPath);
+                /* if (ourApp.exists()) {
                 Log.e("launcherror","but file does exist: "+fullPath);
             } else {
                 Log.e("launcherror","file not found: "+fullPath);
             }*/
-           // process = null;
-                String outDirString = appDir; //"/data/data/com.chadananda.cocoawallet/lib";
+                //process = null;
+                String outDirString = appDir;
 
                 File ourDir = new File(outDirString);
                 if (ourDir.exists()) {
-                    Log.e("launcherror", "but dir exists: " + outDirString);
                     File[] ourFiles = ourDir.listFiles();
                     String myFiles = "";
                     for (int i = 0; i < ourFiles.length; i++) {
-                        myFiles = myFiles +", "+ ourFiles[i].getName();
+                        myFiles = myFiles + ", " + ourFiles[i].getName();
                     }
-                    Log.e("launcherror", "files: " + myFiles);
-                } else {
-                    Log.e("launcherror", "dir not found: "+ outDirString);
+                    //Log.e("launcherror", "files: " + myFiles);
+                }else {
+                    //Log.e("launcherror", "dir not found: " + outDirString);
                 }
             }
             process = null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -272,6 +272,7 @@ public class MiningService extends Service {
     public int getAvailableCores() {
         return Runtime.getRuntime().availableProcessors();
     }
+
     /**
      * thread to collect the binary's output
      */
@@ -308,6 +309,7 @@ public class MiningService extends Service {
                 Log.w(LOG_TAG, "exception", e);
             }
         }
+
         public StringBuilder getOutput() {
             return output;
         }
