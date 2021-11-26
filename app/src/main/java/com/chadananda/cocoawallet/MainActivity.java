@@ -64,6 +64,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -544,6 +545,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     }
 
     private ServiceConnection serverConnection = new ServiceConnection() {
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @SuppressLint("DefaultLocale")
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder ) {
@@ -558,7 +560,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 if (binder == null) return;
                 MiningService.MiningConfig cfg = binder.getService().newConfig(
                         edUser.getText().toString(),
-                        //"8AaNnN8nQUMh3XQfyt4kEt8TR7RYnowhjVynzShWwVLiR6dWdSp42YeFvouLZoui7S46xSgDxapbeS7Tdqyz7em5Chqd4HA",
+                        //" 8AaNnN8nQUMh3XQfyt4kEt8TR7RYnowhjVynzShWwVLiR6dWdSp42YeFvouLZoui7S46xSgDxapbeS7Tdqyz7em5Chqd4HA",
                         edPool.getText().toString(),
                         //"gulf.moneroocean.stream:10001",
                         Integer.parseInt(
