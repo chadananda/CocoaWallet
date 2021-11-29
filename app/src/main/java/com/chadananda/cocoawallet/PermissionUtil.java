@@ -64,7 +64,6 @@ public class PermissionUtil {
                         permissionsList.add(permissions[i]);
                     }
                 }
-
                 if (permissionsList.isEmpty() && callBack != null) {
                     callBack.permissionsGranted();
                 } else {

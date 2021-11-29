@@ -161,6 +161,18 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
 
         enableButtons(true);
         postData("dero","2500","30",".01","0.06");
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (PermissionUtil.checkAndRequestPermissions(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.INTERNET
+            )) {
+                Log.i("aa", "Permissions are granted. Good to go!");
+            }
+        }
+
         progressbar.setVisibility(View.VISIBLE);
         //cpu.setText("Snap Dragon  "+edMaxCpu.getText().toString());
 
@@ -354,15 +366,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
             }
         });
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (PermissionUtil.checkAndRequestPermissions(this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.INTERNET
-                        )) {
-                    Log.i("aa", "Permissions are granted. Good to go!");
-                }
-            }
+
 
         if (!Arrays.asList(SUPPORTED_ARCHITECTURES).contains(Build.CPU_ABI.toLowerCase())) {
             Toast.makeText(this, "Sorry, this app currently only supports 64 bit architectures, but yours is " + Build.CPU_ABI, Toast.LENGTH_LONG).show();
@@ -380,7 +384,6 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 .baseUrl("https://www.coincalculators.io/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
         Api retrofitAPI = retrofit.create(Api.class);
 
         Call<DataResponse> call = retrofitAPI.createPost(name, hashrate, power, poolfee, powercost);
@@ -523,9 +526,11 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
                 sharingIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
                 Log.e("uri","uri"+fileUri);
+
             }
         },3000);
     }
+
     private void stopMining(View view) {
         binder.getService().stopMining();
     }
@@ -636,6 +641,7 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
             graphView.addSeries(series);
     }
 
+
     @Override
     public void permissionsGranted() {
         Toast.makeText(this, "Permissions Granted!", Toast.LENGTH_SHORT).show();
@@ -645,4 +651,5 @@ public class MainActivity extends Activity implements PermissionUtil.Permissions
     public void permissionsDenied() {
         Toast.makeText(this, "Permissions Denied!", Toast.LENGTH_SHORT).show();
     }
+
 }

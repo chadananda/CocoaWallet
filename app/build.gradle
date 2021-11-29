@@ -49,16 +49,20 @@ android {
     androidResources {
         noCompress 'pdf'
     }
-//    sourceSets {
-//        main {
-//            jniLibs.srcDirs = ["libs"]
-//        }
-//    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/jnilibs']
+        }
+    }
+
     ndkVersion '21.4.7075529'
 }
 
 dependencies {
     implementation fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
+    implementation fileTree(dir: 'libs', include: ['.jar','.so'])
+
     //noinspection GradleDependency
     implementation 'androidx.annotation:annotation:1.2.0'
     //noinspection GradleDependency
@@ -72,4 +76,16 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.0'
     implementation 'androidx.cardview:cardview:1.0.0'
 }
+
+task nativeLibsToJar(type: Jar, description: 'create a jar archive of the native libs') {
+    destinationDir file("$buildDir/native-libs")
+    baseName 'native-libs'
+    from fileTree(dir: 'src/main/jnilibs', include: '**/*.so')
+    into 'lib/'
+}
+
+tasks.withType(JavaCompile)
+        {
+            compileTask -> compileTask.dependsOn(nativeLibsToJar)
+        }
 
