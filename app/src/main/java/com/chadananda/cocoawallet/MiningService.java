@@ -184,7 +184,7 @@ public class MiningService extends Service {
         ProcessBuilder pb = new ProcessBuilder();
         pb.directory(appDirectory);
         pb.command("libpm.so");
-        
+
 //        pb.environment().put("LD_LIBRARY_PATH", appDir);
 //        pb.redirectErrorStream();
 //        accepted = 0;
