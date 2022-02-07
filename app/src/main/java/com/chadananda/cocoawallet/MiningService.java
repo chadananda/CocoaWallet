@@ -185,16 +185,16 @@ public class MiningService extends Service {
         pb.directory(appDirectory);
         pb.command("libpm.so");
 
-//        pb.environment().put("LD_LIBRARY_PATH", appDir);
-//        pb.redirectErrorStream();
-//        accepted = 0;
+        pb.environment().put("LD_LIBRARY_PATH", appDir);
+        pb.redirectErrorStream();
+        accepted = 0;
 
         // this crashes with wrong error message. It says file does not exists, although it does
         Process process = pb.start();
 
-//        outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
-//        outputHandler.start();
-//        Toast.makeText(this, "started: ", Toast.LENGTH_SHORT).show();
+        outputHandler = new MiningService.OutputReaderThread(process.getInputStream());
+        outputHandler.start();
+        Toast.makeText(this, "started: ", Toast.LENGTH_SHORT).show();
 
       } catch (Exception e) {
         Log.e("launcherror","error: "+e.getLocalizedMessage()+e.getCause());
